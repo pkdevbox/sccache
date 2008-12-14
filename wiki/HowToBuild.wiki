@@ -33,8 +33,17 @@ Here is a summary of the dependencies:
 || client || _sccache_/source/implementation/client || chunked, generic_io, common, api ||
 || server || _sccache_/source/implementation/server || chunked, generic_io, common, api ||
 
+
 = Compiling Modules =
 
 *chunked*<br>
 cd source/utilities/chunked/classes/com/shop/util/chunked/src<br>
 javac -d ../classes ./com/shop/util/chunked/`*`.java
+
+*generic_io*<br>
+cd source/utilities/chunked/classes/com/shop/util/generic_io/src<br>
+javac -d ../classes ./com/shop/util/`*`.java ./com/shop/util/generic/`*`.java
+
+*ccdb2*<br>
+cd source/utilities/chunked/classes/com/shop/util/ccdb2/src<br>
+javac -cp ../../chunked/classes -d ../classes ./com/shop/util/ccdb2/`*`.java
