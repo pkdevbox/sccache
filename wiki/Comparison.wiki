@@ -1,3 +1,6 @@
+#summary Comparison of Shop.com Cache with other caching libraries
+
+= Comparison Chart =
 || || *Shop.com Cache* || *Memcached* || *Jboss* || *Terracotta* || *cache4j* ||
 ||Non-Transactional|| `*****` || `*****` || || || ||
 ||Any Size Key|| `*****` || || || || ||
