@@ -77,3 +77,9 @@ javac -d ../classes -cp ../../../api/classes;../../../utilities/chunked/classes;
 cd source/implementation/client/src
 javac -d ../classes -cp ../../../api/classes;../../../utilities/chunked/classes;../../../utilities/generic_io/classes;../../common/classes ./com/shop/cache/imp/client/*.java
 }}}
+
+*server*
+{{{
+cd source/implementation/server/src
+javac -d ../classes -cp ../../../api/classes;../../../utilities/chunked/classes;../../../utilities/generic_io/classes;../../common/classes ./com/shop/cache/imp/server/*.java
+}}}
