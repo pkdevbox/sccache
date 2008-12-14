@@ -1,0 +1,19 @@
+|| || *ShopComCache* || *Memcached* || *Jboss* || *Terracotta* || *cache4j* ||
+||Non-Transactional|| `*****` || || || || ||
+||Any Size Key|| `*****` || || || || ||
+||Any Size Data||`*****` || || || || ||
+||Iterate Keys|| `*****` || || || || ||
+||Data stored to disk|| `*****` || || || || ||
+||Associative Keys|| `*****` || || || || ||
+||Auto-GC based on TTL|| `*****` || || || || ||
+||100% Java|| `*****` || || || || ||
+||Pluggable Architecture|| `*****` || || || || ||
+||In-process cache|| `*****` || || || || ||
+||External, Shared Cache|| `*****` || || || || ||
+||Unlimited Objects in Cache|| `*****` || || || || ||
+||Container/Platform Neutral|| `*****` || || || || ||
+||Horizontally Scalable|| `*****` || || || || ||
+||Simple/Clean API|| `*****` || || || || ||
+||Self-contained - No third party libraries|| `*****` || || || || ||
+||No XML|| `*****` || || || || ||
+||Cache any Serializable object|| `*****` || || || || ||
