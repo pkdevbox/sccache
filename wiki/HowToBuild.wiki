@@ -9,26 +9,26 @@ SHOP.COM Cache is self-contained and can be easily compiled using any build syst
 Because of internal dependencies, the source should be built in the following steps:
 
  # Build the `chunked` module. It's used by nearly every other module.
- # Build the `Generic I/O` module with `chunked` in the CLASSPATH.
- # Build the `API` module with `chunked` in the CLASSPATH.
+ # Build the `generic_io` module with `chunked` in the CLASSPATH.
+ # Build the `api` module with `chunked` in the CLASSPATH.
 
 The above constitute the API portion of SHOP.COM cache. If you are using a custom implementation you can stop here. To build the default implementation:
 
- # Build the `CCDB2` module with `chunked` in the CLASSPATH.
- # Build the `Utils` module with `API` in the CLASSPATH.
- # Build the `Storage` module with `chunked`, `CCDB2` and `API` in the CLASSPATH.
- # Build the `Client` module with `chunked`, `Generic IO`, `Utils` and `API` in the CLASSPATH.
- # Build the `Server` module with `chunked`, `Generic IO`, `Utils` and `API` in the CLASSPATH.
+ # Build the `ccdb2` module with `chunked` in the CLASSPATH.
+ # Build the `common` module with `api` in the CLASSPATH.
+ # Build the `storage` module with `chunked`, `ccdb2` and `api` in the CLASSPATH.
+ # Build the `client` module with `chunked`, `generic_io`, `common` and `api` in the CLASSPATH.
+ # Build the `server` module with `chunked`, `generic_io`, `common` and `api` in the CLASSPATH.
 
 = Dependencies =
 Here is a summary of the dependencies:
 
 || *Module* || *Directory* || *Dependencies* ||
-|| chunked || _sccache_/source/chunked || _none_ ||
-|| generic_io || _sccache_/source/generic_io || chunked ||
+|| chunked || _sccache_/source/utilities/chunked || _none_ ||
+|| generic_io || _sccache_/source/utilities/generic_io || chunked ||
+|| ccdb2 || _sccache_/source/utilities/ccdb2 || chunked ||
 || api || _sccache_/source/api || chunked ||
-|| ccdb2 || _sccache_/source/ccdb2 || chunked ||
-|| utils || _sccache_/source/utils || api ||
-|| storage || _sccache_/source/storage || chunked, ccdb2, api ||
-|| client || _sccache_/source/client || chunked, generic_io, utils, api ||
-|| server || _sccache_/source/server || chunked, generic_io, utils, api ||
+|| common || _sccache_/source/implementation/common || api ||
+|| storage || _sccache_/source/implementation/storage || chunked, ccdb2, api ||
+|| client || _sccache_/source/implementation/client || chunked, generic_io, common, api ||
+|| server || _sccache_/source/implementation/server || chunked, generic_io, common, api ||
