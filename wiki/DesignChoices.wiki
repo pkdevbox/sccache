@@ -1,0 +1,11 @@
+#summary The design choices made for SHOP.COM Cache
+
+= Design Choices =
+
+Here are some of the design choices that have been made in the development of the SHOP.COM Cache.
+
+ * *No transactions* - If you need transactions, you should use a database. A cache should be used to provide quick access to data that doesn't change very often. 
+
+ * *Memory based index* - The default implementation stores the cache index in memory. This should be considered when planning hardware needs.
+
+ * *Maximum TTL* - The default implementation assumes a predefined maximum TTL as a compile time constant. Objects in the cache cannot exceed this maximum (12 hours by default).
