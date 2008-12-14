@@ -46,18 +46,10 @@ A standard implementation of the SHOP.COM Cache API (the implementation used at 
 	<table border="1" cellpadding="5">
 	<tr>
 		<td>
-		Server
+		Server/Client
 		</td>
 		<td>
-		_SHOP.COM cache server implementation_
-		</td>
-	</tr>
-	<tr>
-		<td>
-		Client
-		</td>
-		<td>
-		_SHOP.COM cache client implementation_
+		_SHOP.COM cache client and server implementation_
 		</td>
 	</tr>
 	<tr>
