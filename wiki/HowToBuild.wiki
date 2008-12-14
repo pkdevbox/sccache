@@ -36,18 +36,26 @@ Here is a summary of the dependencies:
 
 = Compiling Modules =
 
-*chunked*<br>
-cd source/utilities/chunked/src<br>
-javac -d ../classes ./com/shop/util/chunked/`*`.java
+*chunked*
+{{{
+cd source/utilities/chunked/src
+javac -d ../classes ./com/shop/util/chunked/*.java
+}}}
 
-*generic_io*<br>
-cd source/utilities/generic_io/src<br>
-javac -d ../classes ./com/shop/util/`*`.java ./com/shop/util/generic/`*`.java
+*generic_io*
+{{{
+cd source/utilities/generic_io/src
+javac -d ../classes ./com/shop/util/*.java ./com/shop/util/generic/*.java
+}}}
 
-*ccdb2*<br>
-cd source/utilities/ccdb2/src<br>
-javac -cp ../../chunked/classes -d ../classes ./com/shop/util/ccdb2/`*`.java
+*ccdb2*
+{{{
+cd source/utilities/ccdb2/src
+javac -cp ../../chunked/classes -d ../classes ./com/shop/util/ccdb2/*.java
+}}}
 
-*api*<br>
-cd source/api/src<br>
-javac -cp ../../utilities/chunked/classes  -d ../classes ./com/shop/cache/api/client/io/`*`.java ./com/shop/cache/api/client/main/`*`.java ./com/shop/cache/api/commands/`*`.java ./com/shop/cache/api/server/`*`.java ./com/shop/cache/api/storage/`*`.java ./com/shop/cache/api/types/`*`.java
+*api*
+{{{
+cd source/api/src
+javac -cp ../../utilities/chunked/classes  -d ../classes ./com/shop/cache/api/client/io/*.java ./com/shop/cache/api/client/main/*.java ./com/shop/cache/api/commands/*.java ./com/shop/cache/api/server/*.java ./com/shop/cache/api/storage/*.java ./com/shop/cache/api/types/*.java
+}}}
