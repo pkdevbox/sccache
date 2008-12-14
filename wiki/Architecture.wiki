@@ -73,7 +73,7 @@ Utilities used by the API, the SHOP.COM implementation or both
 	<table border="1" cellpadding="5">
 	<tr>
 		<td>
-		ChunkedByteArray
+		!ChunkedByteArray
 		</td>
 		<td>
 		_Abstracts an unbounded array that is internally broken into chunks. This avoids allocating large contiguous byte arrays which is very inefficient in Java._
