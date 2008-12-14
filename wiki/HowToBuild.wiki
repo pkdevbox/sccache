@@ -35,6 +35,6 @@ Here is a summary of the dependencies:
 
 = Compiling Modules =
 
-*ccdb2*
-cd source/utilities/chunked/classes/com/shop/util/chunked/src
-javac -d ../classes ./com/shop/util/chunked/*.java
+*chunked*<br>
+cd source/utilities/chunked/classes/com/shop/util/chunked/src<br>
+javac -d ../classes ./com/shop/util/chunked/`*`.java
