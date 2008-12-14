@@ -1,0 +1,7 @@
+#summary Frequently Asked Questions
+
+*Why another cache?*
+
+*What's different about Shop.com Cache?*
+
+TBD
