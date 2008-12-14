@@ -1,4 +1,4 @@
-|| || *ShopComCache* || *Memcached* || *Jboss* || *Terracotta* || *cache4j* ||
+|| || *Shop.com Cache* || *Memcached* || *Jboss* || *Terracotta* || *cache4j* ||
 ||Non-Transactional|| `*****` || || || || ||
 ||Any Size Key|| `*****` || || || || ||
 ||Any Size Data||`*****` || || || || ||
