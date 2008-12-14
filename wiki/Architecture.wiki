@@ -1,0 +1,78 @@
+#summary Describes the architecture of Shop.com Cache
+
+<table border="1" cellpadding="5">
+<tr>
+<td>
+API
+</td>
+<td>
+	<table border="1" cellpadding="5">
+	<tr>
+	<td>
+	Server
+	</td>
+	</tr>
+	<tr>
+	<td>
+	Client
+	</td>
+	</tr>
+	<tr>
+	<td>
+	Storage
+	</td>
+	</tr>
+	</table>
+</td>
+</tr>
+
+<tr>
+<td>
+Implementation
+</td>
+<td>
+	<table border="1" cellpadding="5">
+	<tr>
+	<td>
+	Server
+	</td>
+	</tr>
+	<tr>
+	<td>
+	Client
+	</td>
+	</tr>
+	<tr>
+	<td>
+	Storage
+	</td>
+	</tr>
+	</table>
+</td>
+</tr>
+
+<tr>
+<td>
+Utilities
+</td>
+<td>
+	<table border="1" cellpadding="5">
+	<tr>
+	<td>
+	ChunkedByteArray
+	</td>
+	</tr>
+	<tr>
+	<td>
+	Generic I/O
+	</td>
+	</tr>
+	<tr>
+	<td>
+	CCDB2
+	</td>
+	</tr>
+	</table>
+</td>
+</tr>
+</table>
