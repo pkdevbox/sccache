@@ -34,7 +34,7 @@ Here is a summary of the dependencies:
 || server || _sccache_/source/implementation/server || chunked, generic_io, common, api ||
 
 
-= Compiling Modules =
+= Compiling the Modules =
 
 *chunked*
 {{{
@@ -51,11 +51,29 @@ javac -d ../classes ./com/shop/util/*.java ./com/shop/util/generic/*.java
 *ccdb2*
 {{{
 cd source/utilities/ccdb2/src
-javac -cp ../../chunked/classes -d ../classes ./com/shop/util/ccdb2/*.java
+javac -d ../classes -cp ../../chunked/classes ./com/shop/util/ccdb2/*.java
 }}}
 
 *api*
 {{{
 cd source/api/src
-javac -cp ../../utilities/chunked/classes  -d ../classes ./com/shop/cache/api/client/io/*.java ./com/shop/cache/api/client/main/*.java ./com/shop/cache/api/commands/*.java ./com/shop/cache/api/server/*.java ./com/shop/cache/api/storage/*.java ./com/shop/cache/api/types/*.java
+javac -d ../classes -cp ../../utilities/chunked/classes ./com/shop/cache/api/client/io/*.java ./com/shop/cache/api/client/main/*.java ./com/shop/cache/api/commands/*.java ./com/shop/cache/api/server/*.java ./com/shop/cache/api/storage/*.java ./com/shop/cache/api/types/*.java
+}}}
+
+*common*
+{{{
+cd source/implementation/common/src
+javac -d ../classes -cp ../../../api/classes ./com/shop/cache/imp/common/*.java
+}}}
+
+*storage*
+{{{
+cd source/implementation/storage/src
+javac -d ../classes -cp ../../../api/classes;../../../utilities/chunked/classes;../../../utilities/ccdb2/classes ./com/shop/cache/imp/database/ccdb2/*.java
+}}}
+
+*client*
+{{{
+cd source/implementation/client/src
+javac -d ../classes -cp ../../../api/classes;../../../utilities/chunked/classes;../../../utilities/generic_io/classes;../../common/classes ./com/shop/cache/imp/client/*.java
 }}}
