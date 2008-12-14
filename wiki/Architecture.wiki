@@ -1,4 +1,4 @@
-#summary Describes the architecture of Shop.com Cache
+#summary Describes the architecture of SHOP.COM Cache
 
 <table border="1" cellpadding="5">
 <tr>
@@ -6,21 +6,32 @@
 API
 </td>
 <td>
+SHOP.COM Cache high-level API. This API is implementation neutral. Any cache library could potentially be plugged into
+this API. The API is mostly interfaces with some generic implementation code.
 	<table border="1" cellpadding="5">
 	<tr>
-	<td>
-	Server
-	</td>
+		<td>
+		Server
+		</td>
+		<td>
+		_Cache server interfaces and support code_
+		</td>
 	</tr>
 	<tr>
-	<td>
-	Client
-	</td>
+		<td>
+		Client
+		</td>
+		<td>
+		_Cache client interfaces and support code_
+		</td>
 	</tr>
 	<tr>
-	<td>
-	Storage
-	</td>
+		<td>
+		Storage
+		</td>
+		<td>
+		_Interfaces for writing cached objects to disk_
+		</td>
 	</tr>
 	</table>
 </td>
@@ -31,21 +42,31 @@ API
 Implementation
 </td>
 <td>
+A standard implementation of the SHOP.COM Cache API (the implementation used at SHOP.COM).
 	<table border="1" cellpadding="5">
 	<tr>
-	<td>
-	Server
-	</td>
+		<td>
+		Server
+		</td>
+		<td>
+		_SHOP.COM cache server implementation_
+		</td>
 	</tr>
 	<tr>
-	<td>
-	Client
-	</td>
+		<td>
+		Client
+		</td>
+		<td>
+		_SHOP.COM cache client implementation_
+		</td>
 	</tr>
 	<tr>
-	<td>
-	Storage
-	</td>
+		<td>
+		Storage
+		</td>
+		<td>
+		_Wrapper around CCDB2 as a storage implementation_
+		</td>
 	</tr>
 	</table>
 </td>
@@ -56,21 +77,31 @@ Implementation
 Utilities
 </td>
 <td>
+Utilities used by the API, the SHOP.COM implementation or both
 	<table border="1" cellpadding="5">
 	<tr>
-	<td>
-	ChunkedByteArray
-	</td>
+		<td>
+		ChunkedByteArray
+		</td>
+		<td>
+		_Abstracts an unbounded array that is internally broken into chunks. This avoids allocating large contiguous byte arrays which is very inefficient in Java._
+		</td>
 	</tr>
 	<tr>
-	<td>
-	Generic I/O
-	</td>
+		<td>
+		Generic I/O
+		</td>
+		<td>
+		_General purpose TCP/IP server and client_
+		</td>
 	</tr>
 	<tr>
-	<td>
-	CCDB2
-	</td>
+		<td>
+		CCDB2
+		</td>
+		<td>
+		_A high performance key-to-object database_
+		</td>
 	</tr>
 	</table>
 </td>
