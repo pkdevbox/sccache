@@ -1,13 +1,13 @@
 #summary Frequently Asked Questions
 
-*Why another cache?*
+ * *Why another cache?*
 At SHOP.COM, we've tried almost every cache system there is. None of them do what we need. 
 
-*What's different about SHOP.COM Cache?*
+ * *What's different about SHOP.COM Cache?*
 TBD
 
-*What kinds of things can be cached?*
+ * *What kinds of things can be cached?*
 Any Serializable object. In practice, it's common to cache database result sets, HTML pages, HTTP sessions, etc.
 
-*Why open source it?*
+ * *Why open source it?*
 Our cache was written by one engineer (me). We'd like more eyes on the code and help maintaining it.
