@@ -69,7 +69,7 @@ javac -d ../classes -cp ../../../api/classes ./com/shop/cache/imp/common/*.java
 *storage*
 {{{
 cd source/implementation/storage/src
-javac -d ../classes -cp ../../../api/classes;../../../utilities/chunked/classes;../../../utilities/ccdb2/classes ./com/shop/cache/imp/database/ccdb2/*.java
+javac -d ../classes -cp ../../../api/classes;../../../utilities/chunked/classes;../../../utilities/ccdb2/classes ./com/shop/cache/imp/storage/ccdb2/*.java
 }}}
 
 *client*
