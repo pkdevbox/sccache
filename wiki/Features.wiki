@@ -11,11 +11,14 @@ Unlimited objects can be cached by adding additional cache servers. sccache will
 Cache servers are not limited to available memory. All cached objects are written to disk. This allows cache servers to survive restarts and avoid a "cold start" scenario.
 
 *Associative Keys*<br>
-Objects in the cache can be associated with one or more groups. A group is identified by a number ID. All objects in a group can be deleted with one call.
+Objects in the cache can be associated with one or more groups. A group is identified by a number ID. All objects in a group can be listed or deleted with one call.
 
-Non-Transactional
-Any Size Key
-Any Size Data
+*Non-Transactional*<br>
+Yes, this is a _feature_. Transactions are slow. A cache should not be used as a database. The purpose of a cache is to provide fast access to post-calculated results that are expensive to calculate. 
+
+*Any size key / any size data*<br>
+Key size and data size are limited only by memory. At SHOP.COM we have keys that are several K bytes long and data that is multiple megabytes.
+
 Iterate Keys
 Auto-GC based on TTL
 100% Java
