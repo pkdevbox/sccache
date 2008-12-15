@@ -1,4 +1,5 @@
 #summary Frequently Asked Questions
+#labels Featured
 
  * *Why another cache?*
 At SHOP.COM, we've tried almost every cache system there is. None of them do what we need. 
