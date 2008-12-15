@@ -6,7 +6,7 @@ At SHOP.COM, we've tried almost every cache system there is. None of them do wha
  * *What's different about SHOP.COM Cache?*
 `*` It doesn't try to be a database<br>
 `*` It can handle very large objects and very large keys<br>
-`*` Cached objects can survive and server crash<br>
+`*` Cached objects can survive a server crash<br>
 `*` Has both a local (in-memory) and external/shared cache<br>
 `*` Extremely fast - >20K transactions a minute (depending on hardware)<br>
 See the [Comparison] wiki for more.
