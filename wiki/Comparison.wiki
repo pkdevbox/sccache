@@ -20,3 +20,7 @@
 ||Self-contained - No third party libraries|| `*****` || || || || ||
 ||No XML|| `*****` || || || || ||
 ||Cache any Serializable object|| `*****` || || || || ||
+
+---
+
+*TBD* - Add other cache systems; complete table for each cache system
