@@ -1,4 +1,5 @@
 #summary Comparison of SHOP.COM Cache with other caching libraries
+#labels Featured
 
 = Comparison Chart =
 || || *Shop.com Cache* || *Memcached* || *Jboss* || *Terracotta* || *cache4j* ||
