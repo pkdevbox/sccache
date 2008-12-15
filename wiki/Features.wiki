@@ -2,7 +2,7 @@
 #labels Featured
 
 *In-process cache and external, shared Cache*<br>
-sccache is architected for large server farms. Objects are stored locally in a JVMas well as on a farm of shared cache servers. When an object is cached, you get the benefit of local storage and other servers in your farm have access to the object.
+sccache is architected for large server farms. Objects are stored locally in a JVM as well as on a farm of shared cache servers. When an object is cached, you get the benefit of local storage and other servers in your farm have access to the object.
 
 *Horizontally Scalable*<br>
 Unlimited objects can be cached by adding additional cache servers. sccache will evenly distribute objects amongst the entire farm of cache servers. If a cache server in the farm fails, automatically notices and reconfigures itself to not use that server. It will periodically check to see if the server becomes available and, if it does, automatically add it back to its set of usable servers.
