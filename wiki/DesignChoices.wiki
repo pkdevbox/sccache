@@ -17,7 +17,7 @@ The default implementation assumes a predefined maximum TTL as a compile time co
 The cache is highly optimized for fast reads.
 
 *!SoftReferences and no object qty limit*<br>
-There are no object qty limits. Instead, sccache relies on SoftReferences and the JVM. However, this has GC implications. You may need to tune your java command line arguments.
+There are no object qty limits. Instead, sccache relies on !SoftReferences and the JVM. However, this has GC implications. You may need to tune your java command line arguments.
 
 ---
 
