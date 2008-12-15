@@ -99,3 +99,7 @@ Utilities used by the API, the SHOP.COM implementation or both
 </td>
 </tr>
 </table>
+
+---
+
+*TBD* - Add details for the above outline
