@@ -1,9 +1,0 @@
-#summary The SHOP.COM Cache System User Guide
-
-= Introduction =
-
-The SHOP.COM Cache System (sccache) stores any object that implements Serializable. The objects are stored both in memory and on a shared file server. Cached objects are available to all instances in a server farm.
-
-The cache system consists of two independent components: the in-memory client side cache and the Cache Servers. While both of these components work together, there is no direct coupling between them: i.e. each component is independently replaceable.
-
-See the [Architecture] wiki for details.
