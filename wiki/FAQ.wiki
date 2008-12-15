@@ -4,7 +4,12 @@
 At SHOP.COM, we've tried almost every cache system there is. None of them do what we need. 
 
  * *What's different about SHOP.COM Cache?*
-TBD
+`*` It doesn't try to be a database<br>
+`*` It can handle very large objects and very large keys<br>
+`*` Cached objects can survive and server crash<br>
+`*` Has both a local (in-memory) and external/shared cache<br>
+`*` Extremely fast - >20K transactions a minute (depending on hardware)<br>
+See the [Comparison] wiki for more.
 
  * *What kinds of things can be cached?*
 Any Serializable object. In practice, it's common to cache database result sets, HTML pages, HTTP sessions, etc.
