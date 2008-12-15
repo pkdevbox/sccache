@@ -19,13 +19,8 @@ Yes, this is a _feature_. Transactions are slow. A cache should not be used as a
 *Any size key / any size data*<br>
 Key size and data size are limited only by memory. At SHOP.COM we have keys that are several K bytes long and data that is multiple megabytes.
 
-Iterate Keys
-Auto-GC based on TTL
-100% Java
-Pluggable Architecture
-Unlimited Objects in Cache
-Container/Platform Neutral
-Simple/Clean API
-Self-contained - No third party libraries
-No XML
-Cache any Serializable object
+*Auto-GC based on TTL*<br>
+sccache automatically cleans up stale objects as well as stale database/storage files.
+
+*Container/Platform neutral*<br>
+sccache is totally self-contained. It doesn't rely on any third party libraries or frameworks. 
