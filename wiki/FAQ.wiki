@@ -17,4 +17,6 @@ Any Serializable object. In practice, it's common to cache database result sets,
  * *Why open source it?*
 Our cache was written by one engineer (me). We'd like more eyes on the code and help maintaining it.
 
- *TBD* - complete this FAQ
+---
+
+*TBD* - complete this FAQ
