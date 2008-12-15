@@ -11,3 +11,7 @@ Here are some of the design choices that have been made in the development of th
  * *Maximum TTL* - The default implementation assumes a predefined maximum TTL as a compile time constant. Objects in the cache cannot exceed this maximum (12 hours by default).
 
  * *Optimized for reads over writes* - The cache is highly optimized for fast reads.
+
+---
+
+*TBD* - complete this page
