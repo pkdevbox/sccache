@@ -53,7 +53,7 @@ SCCacheObject    cacher = new SCCacheObject
 (
     myCache,
     new SCDataBlock(myKey),
-    new SCCacheObjectBuilder ()
+    new SCCacheObjectBuilder()
     {
         @Override
         public MyObject buildObject() throws Exception
