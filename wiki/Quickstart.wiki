@@ -8,7 +8,7 @@
 If availability isn't a concern and your caching needs are small, you could run everything on one machine. At SHOP.COM we have lots of app servers and lots of cache servers. The cache servers are 64 bit Windows servers with 8GB of memory each.
 
 *Step 3. Start cache servers*<br>
-At SHOP.COM we use [http://www.dobysoft.com/products/nativej/index.html NativeJ] to run sccache as a service. Here's the code to get the server running:
+Here's the code to get the server running:
 {{{
 SCServerFactory     factory = ShopComCacheFactory.getServerFactory();
 SCServerContext     context = factory.newContext();
