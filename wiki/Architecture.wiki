@@ -1,5 +1,4 @@
 #summary Describes the architecture of SHOP.COM Cache
-#labels Featured
 
 <table border="1" cellpadding="5">
 <tr>
