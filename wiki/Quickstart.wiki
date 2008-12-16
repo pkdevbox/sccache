@@ -1,6 +1,67 @@
 #summary Quick tutorial on how to get started
 #labels Featured
 
-= Introduction =
-
+*Step 1. Get the code*<br>
 *TBD*
+
+*Step 2. Determine hardware needs*<br>
+If availability isn't a concern and your caching needs are small, you could run everything on one machine. At SHOP.COM we have lots of app servers and lots of cache servers. The cache servers are 64 bit Windows servers with 8GB of memory each.
+
+*Step 3. Start cache servers*<br>
+At SHOP.COM we use [http://www.dobysoft.com/products/nativej/index.html NativeJ] to run sccache as a service. Here's the code to get the server running:
+{{{
+SCServerFactory     factory = ShopComCacheFactory.getServerFactory();
+SCServerContext     context = factory.newContext();
+context.port(/*port number*/);
+
+SCStorage           db = CCDB2StorageFactory.create(new CCDB2Parameters());
+db.open(new File(/*directory path*/));
+
+SCServer            server = factory.newServer(context, db);
+server.join();
+}}}
+
+*Step 4. Configure client side*<br>
+In your client application, you access the cache via the {{{SCCache}}} interface. Here's the code to get an instance:
+{{{
+SCClientFactory     clientFactory = ShopComCacheFactory.getClientFactory();
+SCClientContext     context = clientFactory.newContext();
+context.address(new InetSocketAddress(/*address*/, /*port number*/));
+SCClientManager     manager = clientFactory.newClientManager(context);
+
+myCache = new SCCache(manager);
+}}}
+If you have a farm of cache servers, create the {{{SCCache}}} instance this way:
+{{{
+List<SCClientManager> clientSet = new ArrayList<SCClientManager>();
+SCClientFactory       clientFactory = ShopComCacheFactory.getClientFactory();
+
+SCClientContext       context = clientFactory.newContext();
+context.address(new InetSocketAddress(/*address 1*/, /*port number 1*/));
+SCClientManager       manager = clientFactory.newClientManager(context);
+clientSet.add(manager);
+
+// add additional managers for each cache server
+
+myCache = new SCCache(new SCMultiManager(clientSet));
+}}}
+
+*Step 5. Use the cache in your code*<br>
+This is the standard code for caching objects:
+{{{
+SCCacheObject    cacher = new SCCacheObject 
+(
+    myCache,
+    new SCDataBlock(myKey),
+    new SCCacheObjectBuilder ()
+    {
+        @Override
+        public MyObject buildObject() throws Exception
+        {
+            // ....
+            return newMyObject;
+        }
+    }
+);
+obj = cacher.get();
+}}}
