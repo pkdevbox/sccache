@@ -49,11 +49,11 @@ myCache = new SCCache(new SCMultiManager(clientSet));
 *Step 5. Use the cache in your code*<br>
 This is the standard code for caching objects:
 {{{
-SCCacheObject    cacher = new SCCacheObject 
+SCCacheObject<MyObject>    cacher = new SCCacheObject<MyObject> 
 (
     myCache,
     new SCDataBlock(myKey),
-    new SCCacheObjectBuilder()
+    new SCCacheObjectBuilder<MyObject>()
     {
         @Override
         public MyObject buildObject() throws Exception
