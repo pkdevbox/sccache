@@ -36,6 +36,10 @@ Here is a summary of the dependencies:
 
 = Compiling the Modules =
 
+For Windows users, there is a batch file: {{{build.bat}}}. Build files for other platforms is TBD.
+
+Here are the command lines to build each module.
+
 *chunked*
 {{{
 cd source/utilities/chunked/src
@@ -45,7 +49,7 @@ javac -d ../classes ./com/shop/util/chunked/*.java
 *generic_io*
 {{{
 cd source/utilities/generic_io/src
-javac -d ../classes ./com/shop/util/*.java ./com/shop/util/generic/*.java
+javac -d ../classes -cp ../../chunked/classes ./com/shop/util/*.java ./com/shop/util/generic/*.java
 }}}
 
 *ccdb2*
@@ -57,7 +61,7 @@ javac -d ../classes -cp ../../chunked/classes ./com/shop/util/ccdb2/*.java
 *api*
 {{{
 cd source/api/src
-javac -d ../classes -cp ../../utilities/chunked/classes ./com/shop/cache/api/client/io/*.java ./com/shop/cache/api/client/main/*.java ./com/shop/cache/api/commands/*.java ./com/shop/cache/api/server/*.java ./com/shop/cache/api/storage/*.java ./com/shop/cache/api/types/*.java
+javac -d ../classes -cp ../../utilities/chunked/classes ./com/shop/cache/api/client/io/*.java ./com/shop/cache/api/client/main/*.java ./com/shop/cache/api/commands/*.java ./com/shop/cache/api/server/*.java ./com/shop/cache/api/storage/*.java ./com/shop/cache/api/common/*.java
 }}}
 
 *common*
