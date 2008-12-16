@@ -1,10 +1,10 @@
 #summary Frequently Asked Questions
 #labels Featured
 
- * *Why another cache?*
+*Why another cache?*<br>
 At SHOP.COM, we've tried almost every cache system there is. None of them do what we need. 
 
- * *What's different about SHOP.COM Cache?*
+*What's different about SHOP.COM Cache?*<br>
 `*` It doesn't try to be a database<br>
 `*` It can handle very large objects and very large keys<br>
 `*` Cached objects can survive a server crash<br>
@@ -12,17 +12,17 @@ At SHOP.COM, we've tried almost every cache system there is. None of them do wha
 `*` Extremely fast - >20K transactions a minute (depending on hardware)<br>
 See the [Comparison] wiki for more.
 
- * *What's the difference between "sccache" and "SHOP.COM Cache"?*
+*What's the difference between "sccache" and "SHOP.COM Cache"?*<br>
 They're the same. When I get tired of writing out SHOP.COM Cache I use sccache.
 
- * *What kinds of things can be cached?*
+*What kinds of things can be cached?*<br>
 Any Serializable object. In practice, it's common to cache database result sets, HTML pages, HTTP sessions, etc.
 
- * *Why open source it?*
+*Why open source it?*<br>
 Our cache was written by one engineer (me). We'd like more eyes on the code and help maintaining it.
 
- * *How stable is the code?*
-sccache has been used at SHOP.COM in one form or another for 10 years. So, it's stable enough to use in our production environment. However, I've had to make some changes to separate it into an open source library. We are not currently running the open source version at SHOP.COM. I'll post to when we make the change.
+*How stable is the code?*<br>
+sccache has been used at SHOP.COM in one form or another for 10 years. So, it's stable enough to use in our production environment. However, I've had to make some changes to separate it into an open source library. *We are not currently running the open source version at SHOP.COM.* I'll post when we make the change.
 
 ---
 
