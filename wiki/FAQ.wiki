@@ -10,6 +10,7 @@ At SHOP.COM, we've tried almost every cache system there is. None of them do wha
 `*` Cached objects can survive a server crash<br>
 `*` Has both a local (in-memory) and external/shared cache<br>
 `*` Extremely fast - >20K transactions a minute (depending on hardware)<br>
+`*` Highly scalable - sccache scales horizontally extremely well<br>
 See the [Comparison] wiki for more.
 
 *What's the difference between "sccache" and "SHOP.COM Cache"?*<br>
