@@ -2,7 +2,7 @@
 #labels Featured
 
 *Step 1. Get the code*<br>
-*TBD*
+You can get the binaries and latest source tree from the Downloads tab. The source is also available via "svn" form the Source tab.
 
 *Step 2. Determine hardware needs*<br>
 If availability isn't a concern and your caching needs are small, you could run everything on one machine. At SHOP.COM we have lots of app servers and lots of cache servers. The cache servers are 64 bit Windows servers with 8GB of memory each.
