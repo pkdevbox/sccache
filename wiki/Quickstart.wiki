@@ -5,7 +5,7 @@
 You can get the binaries and latest source tree from the Downloads tab. The source is also available via _svn_ from the Source tab.
 
 *Step 2. Determine hardware needs*<br>
-If availability isn't a concern and your caching needs are small, you could run everything on one machine. At SHOP.COM we have lots of app servers and lots of cache servers. The cache servers are 64 bit Windows servers with 8GB of memory each.
+If availability isn't a concern and your caching needs are small, you could run everything on one machine. At [http://www.shop.com SHOP.COM] we have lots of app servers and lots of cache servers. The cache servers are 64 bit Windows servers with 8GB of memory each.
 
 *Step 3. Start cache servers*<br>
 Here's the code to get the server running:
