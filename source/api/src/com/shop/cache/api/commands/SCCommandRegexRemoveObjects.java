@@ -68,8 +68,7 @@ public class SCCommandRegexRemoveObjects implements SCCommand
 				List<String>		keys = server.regExRemove(fKey);
 				long				time = System.currentTimeMillis() - ticks;
 				keys.add(0, "Time: " + time + " ms");
-				keys.add("");	// signal the end
-				connection.sendValue(keys.toArray(new String[keys.size()]));
+				SCSetOfCommands.sendListEndingWithBlankLine(connection, keys);
 			}
 
 			private String			fKey = "";

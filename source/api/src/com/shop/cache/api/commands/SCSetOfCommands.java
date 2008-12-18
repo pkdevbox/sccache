@@ -15,8 +15,10 @@
  */
 package com.shop.cache.api.commands;
 
+import com.shop.cache.api.server.SCConnection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -57,6 +59,19 @@ public class SCSetOfCommands
 	public static String			getCommandName(Class<? extends SCCommand> commandClass)
 	{
 		return fReverseCommandMap.get(commandClass);
+	}
+
+	static void		sendListEndingWithBlankLine(SCConnection connection, List<String> tab) throws Exception
+	{
+		for ( int i = 0; i < tab.size(); ++i )
+		{
+			if ( tab.get(i).length() == 0 )
+			{
+				tab.set(i, " ");
+			}
+		}
+		tab.add("");	// signal the end
+		connection.sendValue(tab.toArray(new String[tab.size()]));
 	}
 
 	private static final Map<String, SCCommand>		fCommandMap;

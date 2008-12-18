@@ -66,8 +66,7 @@ public class SCCommandListGroup implements SCCommand
 			public void executeCommand(SCServer server, SCConnection connection) throws Exception
 			{
 				List<String> keys = server.listGroup(fGroup);
-				keys.add("");	// signal the end
-				connection.sendValue(keys.toArray(new String[keys.size()]));
+				SCSetOfCommands.sendListEndingWithBlankLine(connection, keys);
 			}
 
 			private SCGroup 		fGroup = null;

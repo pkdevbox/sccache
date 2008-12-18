@@ -271,6 +271,12 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 	}
 
 	@Override
+	public void putWithBackup(String key, SCDataSpec data, SCGroupSpec groups) throws Exception
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public void put(String key, SCDataSpec data, SCGroupSpec groups)
 	{
 		TrackerTimer		timer = new TrackerTimer(fPutTimerData);
@@ -373,7 +379,7 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 			TrackerTimer.output(tab, fPutTimerData, verbose);
 			if ( verbose )
 			{
-				tab.add("");
+				tab.add(" ");
 			}
 			tab.addAll(fDatabase.dumpStats(verbose));
 
@@ -390,7 +396,7 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 			tab.add("Transactions Per Minute: " + (fTransactionCount.get() / minutesRunning));
 			tab.add("Abnormal Disconnects:    " + fAbnormalCloses.get());
 
-			tab.add("");
+			tab.add(" ");
 
 			tab.add("Last " + LAST_GET_TIMES_QTY + " get times:");
 			for ( int i = 0; i < LAST_GET_TIMES_QTY; ++i )
@@ -402,8 +408,7 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 				}
 			}
 
-			tab.add("");
-			tab.add("");
+			tab.add(" ");
 		}
 		catch ( IOException e )
 		{

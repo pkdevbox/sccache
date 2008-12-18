@@ -196,6 +196,12 @@ class ImpSCClientManager implements SCClientManager
 	}
 
 	@Override
+	public void putWithBackup(String key, SCDataSpec data, SCGroupSpec groups) throws Exception
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public void put(String key, SCDataSpec data, SCGroupSpec groups) throws Exception
 	{
 		SCClient 			client = getClient();
