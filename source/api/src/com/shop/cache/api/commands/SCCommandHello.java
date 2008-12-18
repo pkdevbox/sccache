@@ -17,6 +17,7 @@ package com.shop.cache.api.commands;
 
 import com.shop.cache.api.server.SCConnection;
 import com.shop.cache.api.server.SCServer;
+import com.shop.cache.api.client.main.SCCache;
 import com.shop.util.chunked.ChunkedByteArray;
 import java.io.IOException;
 import java.util.Collections;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
  */
 @SCDoc
 (
-	description = "Heartbeat mechanism - returns one blank line",
+	description = "Heartbeat mechanism - returns the version number which is currently " + SCCache.VERSION_NUMBER,
 	parameters = {}
 )
 public class SCCommandHello implements SCCommand
@@ -61,7 +62,7 @@ public class SCCommandHello implements SCCommand
 			@Override
 			public void executeCommand(SCServer server, SCConnection connection) throws IOException
 			{
-				connection.sendValue("");
+				connection.sendValue(SCCache.VERSION_NUMBER);
 			}
 		};
 	}

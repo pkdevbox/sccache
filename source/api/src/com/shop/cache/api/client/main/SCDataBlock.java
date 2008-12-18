@@ -63,6 +63,19 @@ public class SCDataBlock
 	}
 
 	/**
+	 * Initialize to defaults, but set the key and data to the given value
+	 *
+	 * @param key key
+	 * @param obj the data
+	 */
+	public SCDataBlock(String key, Object obj)
+	{
+		this();
+		fKey = key;
+		fObject = obj;
+	}
+
+	/**
 	 * Getter for key
 	 *
 	 * @return key
