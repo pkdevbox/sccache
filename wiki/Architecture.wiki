@@ -118,7 +118,7 @@ When an object is put into the cache (via {{{SCCache.put(...)}}}), it is added t
 
 Via the {{{SCManager}}} API, sccache clients maintain multiple connections to the cache servers. If a server goes down for some reason, the client code will notice this and remove that server from its internal list. In the background, it will periodically check to see if the server comes back up, adding back to its list if it does.
 
-For objects that require more failure safety (an !HTTPSession for example), you can use the {{{SCCache.putWithBackup(...)}}} method to write the object to its hashed server as well as a backup server. It the object's designated server goes down, the object will still be available from the backup server.
+For objects that require more failure safety (an HTTPSession for example), you can use the {{{SCCache.putWithBackup(...)}}} method to write the object to its hashed server as well as a backup server. It the object's designated server goes down, the object will still be available from the backup server.
 
 ===Server Architecture===
 sccache Servers listen on a designated port for Client connections. 
