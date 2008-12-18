@@ -888,7 +888,7 @@ public class GenericCommandClientServer<T>
 		{
 			while ( !fDone )
 			{
-				String			line = fIn.read_line();
+				String			line = fIn.readLine();
 				if ( line == null )
 				{
 					fDone = true;
@@ -1207,7 +1207,7 @@ public class GenericCommandClientServer<T>
 		{
 			assert isSafeToUse();
 
-			return fIn.read_line();
+			return fIn.readLine();
 		}
 
 		@Override

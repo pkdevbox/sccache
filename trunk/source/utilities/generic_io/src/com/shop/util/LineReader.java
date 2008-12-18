@@ -18,7 +18,7 @@ package com.shop.util;
 import java.io.*;
 
 /**
- * Listens for administration commands<br>
+ * A line reading wrapper that works with byte streams. Has the same sematics as {@link BufferedReader}<br>
  *
  * @author Jordan Zimmerman
  */
@@ -26,28 +26,41 @@ public class LineReader extends InputStream
 {
 	public LineReader(InputStream in)
 	{
-		in_mbr = in;
-		buffer_mbr = new StringBuilder();
-		last_was_cr_mbr = false;
-		pushback_char_mbr = 0;
+		fIn = in;
+		fBuffer = new StringBuilder();
+		fLastWasCR = false;
+		fPushbackChar = 0;
 	}
 
 	@Override
 	public synchronized int 			read() throws IOException
 	{
-		if ( pushback_char_mbr == 0 )
+		if ( fPushbackChar == 0 )
 		{
-			return stream_read();
+			return streamRead();
 		}
 		else
 		{
-			return pushback_read();
+			return pushbackRead();
 		}
 	}
 
-	public synchronized String		read_line() throws IOException
+	/**
+	 * copied from {@link BufferedReader#readLine()} 
+	 *
+	 * Reads a line of text.  A line is considered to be terminated by any one
+	 * of a line feed ('\n'), a carriage return ('\r'), or a carriage return
+	 * followed immediately by a linefeed.
+	 *
+	 * @return     A String containing the contents of the line, not including
+	 *             any line-termination characters, or null if the end of the
+	 *             stream has been reached
+	 *
+	 * @exception  IOException  If an I/O error occurs
+	 */
+	public synchronized String 		readLine() throws IOException
 	{
-		buffer_mbr.setLength(0);
+		fBuffer.setLength(0);
 
 		boolean		eof = false;
 		for(;;)
@@ -61,7 +74,7 @@ public class LineReader extends InputStream
 
 			if ( b == '\r' )
 			{
-				last_was_cr_mbr = true;
+				fLastWasCR = true;
 				break;
 			}
 
@@ -69,17 +82,17 @@ public class LineReader extends InputStream
 			{
 				break;
 			}
-            buffer_mbr.append((char)(b & 0xFF));
+            fBuffer.append((char)(b & 0xFF));
 		}
-		return ((buffer_mbr.length() == 0) && eof) ? null : buffer_mbr.toString();
+		return ((fBuffer.length() == 0) && eof) ? null : fBuffer.toString();
 	}
 
 	@Override
 	public synchronized void 	close() throws IOException
 	{
 		super.close();
-		buffer_mbr = null;
-		in_mbr.close();
+		fBuffer = null;
+		fIn.close();
 	}
 
 	/**
@@ -88,22 +101,22 @@ public class LineReader extends InputStream
 	 */
 	public synchronized void	pushback(int c)
 	{
-		pushback_char_mbr = c;
+		fPushbackChar = c;
 	}
 
-	private int pushback_read()
+	private int pushbackRead()
 	{
-		int		b = pushback_char_mbr;
-		pushback_char_mbr = 0;
+		int		b = fPushbackChar;
+		fPushbackChar = 0;
 		return b;
 	}
 
-	private int stream_read() throws IOException
+	private int streamRead() throws IOException
 	{
-		int				b = in_mbr.read();
-		if ( last_was_cr_mbr )
+		int				b = fIn.read();
+		if ( fLastWasCR )
 		{
-			last_was_cr_mbr = false;
+			fLastWasCR = false;
 
 			char	c = (char)(b & 0xff);
 			if ( c == '\n' )
@@ -115,8 +128,8 @@ public class LineReader extends InputStream
 		return b;
 	}
 
-	private InputStream			in_mbr;
-	private StringBuilder		buffer_mbr;
-	private boolean				last_was_cr_mbr;
-	private int					pushback_char_mbr;
+	private InputStream fIn;
+	private StringBuilder fBuffer;
+	private boolean fLastWasCR;
+	private int fPushbackChar;
 }

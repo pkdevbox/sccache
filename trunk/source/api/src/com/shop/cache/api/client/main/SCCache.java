@@ -15,13 +15,16 @@
  */
 package com.shop.cache.api.client.main;
 
-import com.shop.util.chunked.ChunkedByteArray;
 import com.shop.cache.api.client.io.SCManager;
+import com.shop.cache.api.client.io.SCMultiManager;
 import com.shop.cache.api.common.SCDataSpec;
 import com.shop.cache.api.common.SCNotifications;
+import com.shop.cache.api.common.SCGroup;
+import com.shop.util.chunked.ChunkedByteArray;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.List;
 
 /**
  * The main cache APIs for clients.
@@ -58,7 +61,7 @@ public class SCCache
 		fSerializer = (serializer != null) ? serializer : new DefaultSerializer();
 		fMemoryCache = (memoryCache != null) ? memoryCache : new DefaultMemoryCache(manager);
 		fNotificationHandler = null;
-		fPutSet = new LinkedBlockingDeque<SCDataBlock>();
+		fPutSet = new LinkedBlockingDeque<PutWrapper>();
 		fPutThread = new Thread
 		(
 			new Runnable()
@@ -112,16 +115,6 @@ public class SCCache
 	}
 
 	/**
-	 * Return the manager
-	 *
-	 * @return manager
-	 */
-	public SCManager getManager()
-	{
-		return fManager;
-	}
-
-	/**
 	 * Put the object specified by the given data block into the cache
 	 *
 	 * @param block data. At minimum, {@link SCDataBlock#key(String)}, {@link SCDataBlock#ttl(long)} and {@link SCDataBlock#object(Object)} must be set.
@@ -129,19 +122,24 @@ public class SCCache
 	 */
 	public void			put(SCDataBlock block)
 	{
-		checkOpen();
+		boolean withBackup = false;
+		internalPut(block, withBackup);
+	}
 
-		block.data(null);	// just in case
-
-		if ( block.getCanBeStoredInMemory() )
-		{
-			fMemoryCache.put(block);
-		}
-
-		if ( block.getCanBeStoredExternally() )
-		{
-			fPutSet.offer(block);
-		}
+	/**
+	 * Only available if the {@link SCMultiManager} is being used<p>
+	 *
+	 * Same as {@link #put(SCDataBlock)} - however, the data is written to
+	 * 2 managed servers for safety. i.e. if the main server fails, the data is still
+	 * available on the backup.
+	 *
+	 * @param block data. At minimum, {@link SCDataBlock#key(String)}, {@link SCDataBlock#ttl(long)} and {@link SCDataBlock#object(Object)} must be set.
+	 * Ownership of the block is taken by this method.
+	 */
+	public void			putWithBackup(SCDataBlock block)
+	{
+		boolean withBackup = true;
+		internalPut(block, withBackup);
 	}
 
 	/**
@@ -237,6 +235,129 @@ public class SCCache
 	}
 
 	/**
+	 * Return the object's TTL
+	 *
+	 * @param key key of the object
+	 * @return TTL or 0
+	 * @throws Exception errors
+	 */
+	public long 			getTTL(String key) throws Exception
+	{
+		return fManager.getTTL(key);
+	}
+
+	/**
+	 * Remove an object from the cache
+	 *
+	 * @param key object key
+	 * @throws Exception errors
+	 */
+	public void				remove(String key) throws Exception
+	{
+		fManager.remove(key);
+	}
+
+	/**
+	 * sccache supports associative keys via {@link SCGroup}. This method deletes all objects
+	 * associated with the given group.
+	 *
+	 * @param group the group to delete
+	 * @return list of keys deleted.
+	 * @throws Exception errors
+	 */
+	public List<String> removeGroup(SCGroup group) throws Exception
+	{
+		return fManager.removeGroup(group);
+	}
+
+	/**
+	 * sccache supports associative keys via {@link SCGroup}. This method returns all object keys
+	 * associated with the given group.
+	 *
+	 * @param group the group to list
+	 * @return list of keys
+	 * @throws Exception errors
+	 */
+	public List<String> 		listGroup(SCGroup group) throws Exception
+	{
+		return fManager.listGroup(group);
+	}
+
+	/**
+	 * Returns server statistics
+	 *
+	 * @param verbose if true, verbose stats are returned
+	 * @return list of stats
+	 * @throws Exception errors
+	 */
+	public List<String> 		dumpStats(boolean verbose) throws Exception
+	{
+		return fManager.dumpStats(verbose);
+	}
+
+	/**
+	 * Returns a stack trace from all the threads in the JVM
+	 *
+	 * @return list of stack traces
+	 * @throws Exception errors
+	 */
+	public List<String> 		stackTrace() throws Exception
+	{
+		return fManager.stackTrace();
+	}
+
+	/**
+	 * Returns all the current connections to the server and what command each connection is processing
+	 *
+	 * @return list of connections
+	 * @throws Exception errors
+	 */
+	public List<String> 		getConnectionList() throws Exception
+	{
+		return fManager.getConnectionList();
+	}
+
+	/**
+	 * Deletes objects with keys that match the given regular expression
+	 *
+	 * @param expression regex
+	 * @return list of keys deleted
+	 * @throws Exception errors
+	 */
+	public List<String>			regExRemove(String expression) throws Exception
+	{
+		return fManager.regExRemove(expression);
+	}
+
+	/**
+	 * The server will write a tab delimited file with information about the key index
+	 *
+	 * @param fPath the file to write to
+	 * @throws Exception errors
+	 */
+	public void 				writeKeyData(String fPath) throws Exception
+	{
+		fManager.writeKeyData(fPath);
+	}
+
+	private void internalPut(SCDataBlock block, boolean withBackup)
+	{
+		checkOpen();
+
+		block.data(null);	// just in case
+
+		if ( block.getCanBeStoredInMemory() )
+		{
+			fMemoryCache.put(block);
+		}
+
+		if ( block.getCanBeStoredExternally() )
+		{
+			fPutSet.offer(new PutWrapper(block, withBackup));
+		}
+	}
+
+	/**
 	 * Throw an exception if the cache has been closed
 	 */
 	private void checkOpen()
@@ -250,15 +371,22 @@ public class SCCache
 	/**
 	 * serialize and send the given block
 	 *
-	 * @param block the block to send
+	 * @param wrapper the block to send
 	 */
-	private void	processPut(SCDataBlock block)
+	private void	processPut(PutWrapper wrapper)
 	{
 		try
 		{
-			ChunkedByteArray 		data = fSerializer.serialize(block);
-			SCDataSpec spec = new SCDataSpec(data, block.getTTL());
-			fManager.put(block.getKey(), spec, block.getGroups());
+			ChunkedByteArray 		data = fSerializer.serialize(wrapper.block);
+			SCDataSpec spec = new SCDataSpec(data, wrapper.block.getTTL());
+			if ( wrapper.withBackup )
+			{
+				fManager.putWithBackup(wrapper.block.getKey(), spec, wrapper.block.getGroups());
+			}
+			else
+			{
+				fManager.put(wrapper.block.getKey(), spec, wrapper.block.getGroups());
+			}
 		}
 		catch ( Throwable e )
 		{
@@ -353,10 +481,22 @@ public class SCCache
 		return true;
 	}
 
+	private static class PutWrapper
+	{
+		final SCDataBlock		block;
+		final boolean			withBackup;
+
+		private PutWrapper(SCDataBlock block, boolean withBackup)
+		{
+			this.block = block;
+			this.withBackup = withBackup;
+		}
+	}
+
 	private final SCManager 							fManager;
 	private final SCSerializer 							fSerializer;
 	private final SCMemoryCache							fMemoryCache;
-	private final LinkedBlockingDeque<SCDataBlock> 		fPutSet;
+	private final LinkedBlockingDeque<PutWrapper> 		fPutSet;
 	private final Thread 								fPutThread;
 	private final AtomicBoolean 						fIsOpen;
 	private volatile SCNotifications 					fNotificationHandler;

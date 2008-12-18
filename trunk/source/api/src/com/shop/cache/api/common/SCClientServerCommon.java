@@ -16,6 +16,7 @@
 package com.shop.cache.api.common;
 
 import com.shop.util.chunked.ChunkedByteArray;
+import com.shop.cache.api.client.io.SCMultiManager;
 import java.util.List;
 
 /**
@@ -56,6 +57,20 @@ public interface SCClientServerCommon
 	 * @throws Exception errors
 	 */
 	public void				put(String key, SCDataSpec data, SCGroupSpec groups) throws Exception;
+
+	/**
+	 * Only available if the {@link SCMultiManager} is being used<p>
+	 *
+	 * Same as {@link #put(String, SCDataSpec, SCGroupSpec)} - however, the data is written to
+	 * 2 managed servers for safety. i.e. if the main server fails, the data is still
+	 * available on the backup.
+	 *
+	 * @param key Key
+	 * @param data data and TTL
+	 * @param groups groups or null for no groups
+	 * @throws Exception errors
+	 */
+	public void 			putWithBackup(String key, SCDataSpec data, SCGroupSpec groups) throws Exception;
 
 	/**
 	 * Remove an object from the cache

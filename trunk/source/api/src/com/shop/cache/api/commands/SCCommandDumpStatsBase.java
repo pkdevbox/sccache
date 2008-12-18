@@ -62,8 +62,7 @@ public abstract class SCCommandDumpStatsBase implements SCCommand
 			public void executeCommand(SCServer server, SCConnection connection) throws Exception
 			{
 				List<String>			tab = server.dumpStats(fVerbose);
-				tab.add("");	// signal the end
-				connection.sendValue(tab.toArray(new String[tab.size()]));
+				SCSetOfCommands.sendListEndingWithBlankLine(connection, tab);
 			}
 		};
 	}

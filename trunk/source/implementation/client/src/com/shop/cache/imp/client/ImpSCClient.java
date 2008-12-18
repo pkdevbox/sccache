@@ -252,6 +252,12 @@ class ImpSCClient implements SCClient
 	}
 
 	@Override
+	public void putWithBackup(String key, SCDataSpec data, SCGroupSpec groups) throws Exception
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public void put(String key, SCDataSpec spec, SCGroupSpec groups) throws Exception
 	{
 		key = filterKey(key);
@@ -388,11 +394,18 @@ class ImpSCClient implements SCClient
 
 	private void getUntilBlankLine(GenericCommandClientServer.AcquireReaderData data, List<String> tab) throws IOException
 	{
-		String		line = data.line;
-		while ( line.length() > 0 )
+		try
 		{
-			tab.add(line);
-			line = data.reader.readLine();
+			String		line = data.line;
+			while ( line.length() > 0 )
+			{
+				tab.add(line);
+				line = data.reader.readLine();
+			}
+		}
+		finally
+		{
+			data.reader.release();
 		}
 	}
 
