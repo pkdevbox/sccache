@@ -173,38 +173,6 @@ class ImpSCClient implements SCClient
 	}
 
 	@Override
-	public void dumpStats(List<String> lines, boolean verbose) throws Exception
-	{
-		GenericCommandClientServerReader 	reader = null;
-		try
-		{
-			GenericCommandClientServer.AcquireReaderData 	readerPair = fGen.SendFlushWaitReceiveAcquireReader(SCSetOfCommands.getCommandName(verbose ? SCCommandDumpStats.class : SCCommandDumpShortStats.class));
-			reader = readerPair.reader;
-
-			int		lineCount = safeParseInt(readerPair.line);
-			while ( lineCount-- > 0 )
-			{
-				lines.add(reader.readLine());
-			}
-		}
-		catch ( IOException e )
-		{
-			if ( fManager != null )
-			{
-				fManager.registerException(e);
-			}
-			throw e;
-		}
-		finally
-		{
-			if ( reader != null )
-			{
-				reader.release();
-			}
-		}
-	}
-
-	@Override
 	public void keyDump(String remoteFilename) throws IOException
 	{
 		try

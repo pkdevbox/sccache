@@ -47,15 +47,6 @@ public interface SCClient extends SCClientServerCommon
 	public void				stopServer() throws Exception;
 
 	/**
-	 * Gets stats from the server
-	 *
-	 * @param lines the stats are returned in this list
-	 * @param verbose if true, get verbose stats
-	 * @throws Exception any errors
-	 */
-	public void				dumpStats(List<String> lines, boolean verbose) throws Exception;
-
-	/**
 	 * Tell the server to write a file of key/object information to the given file path
 	 *
 	 * @param remoteFilename where to write the file (locally to the server)

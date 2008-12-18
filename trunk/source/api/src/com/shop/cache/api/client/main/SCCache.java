@@ -31,6 +31,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SCCache
 {
 	/**
+	 * The current release number
+	 */
+	public static final String 		VERSION_NUMBER = "0.2";
+
+	/**
 	 * Create a cache instance using the given manager
 	 *
 	 * @param manager the Manager or Multi-Manager to use
