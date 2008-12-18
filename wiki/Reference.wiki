@@ -23,4 +23,6 @@ _Storage_<br>
 The sccache storage API provides a framework for sccache Servers to write cached objects to disk. TBD
 
 ===Details===
+See [Architecture].
+
 TBD
