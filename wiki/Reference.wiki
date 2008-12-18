@@ -8,7 +8,14 @@ The [http://www.shop.com SHOP.COM] Cache System (sccache) is a high performance,
 The sccache system consists of three major components: Servers, Clients and Storage. sccache presents an abstract interface to these components that is implementation neutral. If needed, custom implementations can be written for any of the components. For most uses, however, the default SHOP.COM implementation will be used.
 
 _Clients_<br>
-sccache clients are any application that needs to consume/produce cached objects. TBD
+sccache Clients are any application that needs to consume/produce cached objects. The class that abstracts an sccache Client is {{{SCCache}}}. {{{SCCache}}} has methods to get objects from the cache, put objects into the cache, etc. Here's a sample of the available methods:
+{{{
+public Object get(...);
+public void put(...);
+public List<String> listGroup(...); // sccache supports associative keys
+public List<String> regExRemove(String expression);
+public List<String> dumpStats(boolean verbose);
+}}}
 
 _Server_<br>
 sccache Servers are shared repositories for objects. TBD
