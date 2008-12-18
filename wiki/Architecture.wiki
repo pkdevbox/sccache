@@ -107,18 +107,18 @@ sccache offers an in-process cache and an external shared cache.
 
 The in-process cache is abstracted by the {{{SCMemoryCache}}} interface. The default implementation uses the JDK {{{ConcurrentHashMap}}} and {{{SoftReference}}}s. Additionally, it maintains a background thread that periodically checks local cached objects against the shared external cache for staleness.
 
-The external shared cache consists of one or more servers. Clients communicate with the servers via TCP/IP using a simple telnet-style protocol. When there are multiple servers, the clients treat them as a single "HashMap" writing objects based on the hash code of the object's key. 
+The external shared cache consists of one or more servers. Clients communicate with the servers via TCP/IP using a simple telnet-style protocol. When there are multiple servers, the clients treat them as a single "!HashMap" writing objects based on the hash code of the object's key. 
 
 When an object is requested from the cache, the local in-process cache is checked. If the object is found, it is returned. If not found, the shared external cache is checked. If found, it is added to the local in-process cache and then returned. 
 
 ===Client Architecture===
-The Client API loosely resembles a HashMap. It has methods to {{{put}}} objects referenced by a key and methods to {{{get}}} objects.
+The Client API loosely resembles a !HashMap. It has methods to {{{put}}} objects referenced by a key and methods to {{{get}}} objects.
 
 When an object is put into the cache (via {{{SCCache.put(...)}}}), it is added to the in-process cache and then put into a queue that, in the background, sends objects to the shared external caches. This makes the put() operation extremely fast.
 
 Via the {{{SCManager}}} API, sccache clients maintain multiple connections to the cache servers. If a server goes down for some reason, the client code will notice this and remove that server from its internal list. In the background, it will periodically check to see if the server comes back up, adding back to its list if it does.
 
-For objects that require more failure safety (an HTTPSession for example), you can use the {{{SCCache.putWithBackup(...)}}} method to write the object to its hashed server as well as a backup server. It the object's designated server goes down, the object will still be available from the backup server.
+For objects that require more failure safety (an !HTTPSession for example), you can use the {{{SCCache.putWithBackup(...)}}} method to write the object to its hashed server as well as a backup server. It the object's designated server goes down, the object will still be available from the backup server.
 
 ===Server Architecture===
 sccache Servers listen on a designated port for Client connections. 
