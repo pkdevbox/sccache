@@ -51,6 +51,7 @@ This is the standard code for caching objects:
 {{{
 // see if your object is in the cache
 MyObject    obj = (MyObject)myCache.get(new SCDataBlock(myKey));
+
 // if it's not, allocate it and add it to the cache
 if ( obj == null )
 {
