@@ -4,7 +4,6 @@
 ===Introduction===
 The [http://www.shop.com SHOP.COM] Cache System (sccache) is a high performance, highly scalable object caching system. It is a 100% Java library and can cache any object of any size that implements {{{Serializable}}}. Cached objects are referenced by {{{String}}} keys of any length. sccache is used by SHOP.COM to cache generated HTML pages, SQL queries, HTTP Sessions, POJO objects, etc. 
 
-===Details===
 The sccache system consists of three major components: Servers, Clients and Storage. sccache presents an abstract interface to these components that is implementation neutral. If needed, custom implementations can be written for any of the components. For most uses, however, the default SHOP.COM implementation will be used.
 
 _Clients_<br>
@@ -22,3 +21,6 @@ sccache Servers are shared repositories for objects. TBD
 
 _Storage_<br>
 The sccache storage API provides a framework for sccache Servers to write cached objects to disk. TBD
+
+===Details===
+TBD
