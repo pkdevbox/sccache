@@ -50,4 +50,4 @@ SCCacheObject<MyObject>   cacher = new SCCacheObject<MyObject>
 MyObject  obj = cacher.get();
 }}}
 
-The call to {{{cacher.get()}}} checks the cache for the object and if found returns it. If not found, it calls the passed in {{{SCCacheObjectBuilder}}} to allocate a new instance which is then added to the cached and returned back to the caller.
+The call to {{{cacher.get()}}} checks the cache for the object and if found returns it. If not found, it calls the passed in {{{SCCacheObjectBuilder}}} to allocate a new instance which is then added to the cache and returned back to the caller.
