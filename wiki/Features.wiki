@@ -8,7 +8,7 @@ sccache is architected for large server farms. Objects are stored locally in a J
 Unlimited objects can be cached by adding additional cache servers. sccache will evenly distribute objects amongst the entire farm of cache servers. If a cache server in the farm fails, automatically notices and reconfigures itself to not use that server. It will periodically check to see if the server becomes available and, if it does, automatically add it back to its set of usable servers.
 
 *Data stored to disk*<br>
-Cache servers are not limited to available memory. All cached objects are written to disk. This allows cache servers to survive restarts and avoid a "cold start" scenario.
+Cache servers are not limited to available memory. All cached objects are written to disk. This allows cache servers to survive restarts and avoid a "cold start" scenario. See [CCDB2] for details.
 
 *Associative Keys*<br>
 Objects in the cache can be associated with one or more groups. A group is identified by a number ID. All objects in a group can be listed or deleted with one call.
