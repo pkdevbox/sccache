@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary Standalone utility that abstracts an unbounded array that is internally broken into chunks.
 
 === Description ===
 
