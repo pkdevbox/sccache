@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
  * Main API for CCDB2<br>
  *
  * @author Jordan Zimmerman
+ * @since 1.1 JLZ 12/30/2008 - delete() wasn't closing the instance. This caused a resource leak (the background put thread).
  */
 @SuppressWarnings({"ResultOfMethodCallIgnored", "SynchronizationOnLocalVariableOrMethodParameter"})
 public class CCDB2Instance implements CCDB2UpdateIndexInterface
@@ -576,18 +577,10 @@ public class CCDB2Instance implements CCDB2UpdateIndexInterface
 	 */
 	public void		delete() throws IOException
 	{
-		fIsOpen.set(false);
+		close(new AtomicInteger());
 
 		if ( fFilePath != null )
 		{
-			waitForNoUsers();
-
-			if ( fFile != null )
-			{
-				fFile.close();
-				fFile = null;
-			}
-
 			if ( fIndexFile != null )
 			{
 				fIndexFile.close();
