@@ -36,7 +36,7 @@ public class SCCache
 	/**
 	 * The current release number
 	 */
-	public static final String 		VERSION_NUMBER = "0.3";
+	public static final String 		VERSION_NUMBER = "0.5";
 
 	/**
 	 * Create a cache instance using the given manager
