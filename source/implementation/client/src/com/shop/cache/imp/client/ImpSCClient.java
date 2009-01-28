@@ -97,8 +97,7 @@ class ImpSCClient implements SCClient
 		try
 		{
 			fIsWaitingForResponse = true;
-			fGen.send(SCSetOfCommands.getCommandName(SCCommandKeyDump.class));
-			fGen.sendFlushWaitReceive(fPath);	// ignore the result
+			fGen.sendFlushWaitReceive(SCSetOfCommands.getCommandName(SCCommandKeyDump.class), fPath);	// ignore the result
 			fIsWaitingForResponse = false;
 		}
 		catch ( Exception e )
@@ -119,8 +118,7 @@ class ImpSCClient implements SCClient
 		try
 		{
 			fIsWaitingForResponse = true;
-			fGen.send(SCSetOfCommands.getCommandName(SCCommandGetObjectTTL.class));
-			String		result = fGen.sendFlushWaitReceive(key);
+			String		result = fGen.sendFlushWaitReceive(SCSetOfCommands.getCommandName(SCCommandGetObjectTTL.class), key);
 			fIsWaitingForResponse = false;
 
 			return safeParseLong(result);
@@ -211,8 +209,8 @@ class ImpSCClient implements SCClient
 			GenericCommandClientServerReader 	reader = null;
 			try
 			{
-				fGen.send(SCSetOfCommands.getCommandName(ignoreTTL ? SCCommandGetObjectIgnoreTTL.class : SCCommandGetObject.class));
-				GenericCommandClientServer.AcquireReaderData 	readerPair = fGen.sendFlushWaitReceiveAcquireReader(key);
+				String 			commandName = SCSetOfCommands.getCommandName(ignoreTTL ? SCCommandGetObjectIgnoreTTL.class : SCCommandGetObject.class);
+				GenericCommandClientServer.AcquireReaderData 	readerPair = fGen.sendFlushWaitReceiveAcquireReader(commandName, key);
 				reader = readerPair.reader;
 
 				int			size = safeParseInt(readerPair.line);
@@ -369,15 +367,15 @@ class ImpSCClient implements SCClient
 		try
 		{
 			fIsWaitingForResponse = true;
+			GenericCommandClientServer.AcquireReaderData 	data;
 			if ( argument != null )
 			{
-				fGen.send(commandName);
+				data = fGen.sendFlushWaitReceiveAcquireReader(commandName, argument);
 			}
 			else
 			{
-				argument = commandName;
+				data = fGen.sendFlushWaitReceiveAcquireReader(commandName);
 			}
-			GenericCommandClientServer.AcquireReaderData 	data = fGen.sendFlushWaitReceiveAcquireReader(argument);
 			getUntilBlankLine(data, tab);
 			fIsWaitingForResponse = false;
 		}
