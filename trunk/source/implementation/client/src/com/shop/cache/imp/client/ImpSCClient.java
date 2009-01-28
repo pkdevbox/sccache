@@ -212,7 +212,7 @@ class ImpSCClient implements SCClient
 			try
 			{
 				fGen.send(SCSetOfCommands.getCommandName(ignoreTTL ? SCCommandGetObjectIgnoreTTL.class : SCCommandGetObject.class));
-				GenericCommandClientServer.AcquireReaderData 	readerPair = fGen.SendFlushWaitReceiveAcquireReader(key);
+				GenericCommandClientServer.AcquireReaderData 	readerPair = fGen.sendFlushWaitReceiveAcquireReader(key);
 				reader = readerPair.reader;
 
 				int			size = safeParseInt(readerPair.line);
@@ -377,7 +377,7 @@ class ImpSCClient implements SCClient
 			{
 				argument = commandName;
 			}
-			GenericCommandClientServer.AcquireReaderData 	data = fGen.SendFlushWaitReceiveAcquireReader(argument);
+			GenericCommandClientServer.AcquireReaderData 	data = fGen.sendFlushWaitReceiveAcquireReader(argument);
 			getUntilBlankLine(data, tab);
 			fIsWaitingForResponse = false;
 		}

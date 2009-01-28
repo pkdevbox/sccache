@@ -119,7 +119,7 @@ public class GenericCommandClientServer<T>
 	 * @param ticks idle ticks
 	 * @throws SocketException errors
 	 */
-	public void 						setIdleNotificationTimeout(int ticks) throws SocketException
+	public synchronized void 			setIdleNotificationTimeout(int ticks) throws SocketException
 	{
 		if ( isServer() )
 		{
@@ -152,52 +152,49 @@ public class GenericCommandClientServer<T>
 	 */
 	public synchronized void			close()
 	{
-		synchronized(this)
+		if ( !fDone )
 		{
-			if ( !fDone )
+			switch ( fMode )
 			{
-				switch ( fMode )
+				default:
 				{
-					default:
-					{
-						// do nothing
-						break;
-					}
-
-					case ACCEPTED_CLIENT:
-					case CLIENT:
-					{
-						try
-						{
-							flush();
-						}
-						catch ( IOException ignore )
-						{
-							// ignore
-						}
-						break;
-					}
+					// do nothing
+					break;
 				}
 
-				fDone = true;
-				fThread.interrupt();
-
-				if ( fSocket != null )
+				case ACCEPTED_CLIENT:
+				case CLIENT:
 				{
 					try
 					{
-						// the only way to force an exit out of a waiting read
-						fSocket.close();
+						flush();
 					}
 					catch ( IOException ignore )
 					{
 						// ignore
 					}
+					break;
 				}
 			}
 
-			internalNotify();	// there may be waiting threads
+			fDone = true;
+			fThread.interrupt();
+
+			if ( fSocket != null )
+			{
+				try
+				{
+					// the only way to force an exit out of a waiting read
+					fSocket.close();
+				}
+				catch ( IOException ignore )
+				{
+					// ignore
+				}
+			}
 		}
+
+		internalNotify();	// there may be waiting threads
 	}
 
 	/**
@@ -290,24 +287,25 @@ public class GenericCommandClientServer<T>
 	}
 
 	/**
-	 * Synchronous send/receive. Sends the given line and then waits for a single line response. IMPORTANT: You
+	 * Synchronous send/receive. Sends the given line(s) and then waits for a single line response. IMPORTANT: You
 	 * should not have any pending reads/writes on this connection. NOTE: your notification_listener will not be
 	 * called for events that occur during this method's run.
 	 *
-	 * @param line the line to send
+	 * @param lines the line(s) to send
 	 * @return the line returned
 	 * @throws Exception any errors
 	 */
-	public synchronized String 		sendFlushWaitReceive(String line) throws Exception
+	public synchronized String 		sendFlushWaitReceive(String... lines) throws Exception
 	{
-		if ( fMode == mode.SERVER )
+		AcquireReaderData 		localReader = sendFlushWaitReceiveAcquireReader(lines);
+		try
 		{
-			throw new UnsupportedOperationException("send_flush_wait_receive() is only useable by clients");
+			return localReader.line;
 		}
-
-		checkAgainstReader();
-
-		return internalSendFlushWaitReceive(line);
+		finally
+		{
+			localReader.reader.release();
+		}
 	}
 
 	public static class AcquireReaderData
@@ -323,29 +321,29 @@ public class GenericCommandClientServer<T>
 	}
 
 	/**
-	 * Similar to {@link #sendFlushWaitReceive(String)} but after the result is received, the internal reader is put on hold
+	 * Similar to {@link #sendFlushWaitReceive(String[])} but after the result is received, the internal reader is put on hold
 	 * and returned to the client. The client can then do blocking reads as needed. You MUST call
 	 * {@link GenericCommandClientServerReader#release()} at some point to release the reader.
 	 *
-	 * @param line line to send
+	 * @param lines line(s) to send
 	 * @return Both the internal reader and the result of the sent line
 	 * @throws Exception errors
 	 * @see GenericCommandClientServerReader#release() - MUST be called to release reader
 	 */
-	public synchronized AcquireReaderData 	SendFlushWaitReceiveAcquireReader(String line) throws Exception
+	public synchronized AcquireReaderData sendFlushWaitReceiveAcquireReader(String... lines) throws Exception
 	{
 		if ( fMode == mode.SERVER )
 		{
-			throw new UnsupportedOperationException("send_flush_wait_receive_acquire_reader() is only useable by clients");
+			throw new UnsupportedOperationException("sendFlushWaitReceiveAcquireReader() is only useable by clients");
 		}
 
 		if ( fReaderAcquisitionState != ReaderAcquisitionState.RELEASED )
 		{
-			throw new IllegalStateException("send_flush_wait_receive_acquire_reader() cannot be nested");
+			throw new IllegalStateException("sendFlushWaitReceiveAcquireReader() cannot be nested");
 		}
 
 		fReaderAcquisitionState = ReaderAcquisitionState.NEEDS_ONE_LINE;
-		String		result = internalSendFlushWaitReceive(line);
+		String		result = internalSendFlushWaitReceive(lines);
 
 		fReader.setSafeToUse(true);
 		return new AcquireReaderData(result, fReader);
@@ -464,7 +462,7 @@ public class GenericCommandClientServer<T>
 		}
 	}
 
-	private String 	internalSendFlushWaitReceive(String line) throws Exception
+	private String 	internalSendFlushWaitReceive(String... lines) throws Exception
 	{
 		GenericCommandClientServerListener<T> saveListener = fListener;
 		try
@@ -472,7 +470,10 @@ public class GenericCommandClientServer<T>
 			InternalNotificationListener internalListener = new InternalNotificationListener(saveListener);
 			fListener = internalListener;
 
-			internalSend(line);
+			for ( String l : lines )
+			{
+				internalSend(l);
+			}
 			flush();
 
 			//noinspection ThrowableResultOfMethodCallIgnored
@@ -512,7 +513,7 @@ public class GenericCommandClientServer<T>
 	{
 		if ( fReaderAcquisitionState == ReaderAcquisitionState.RELEASED )
 		{
-			throw new IllegalStateException("send_flush_wait_receive_acquire_reader() has not been called");
+			throw new IllegalStateException("sendFlushWaitReceiveAcquireReader() has not been called");
 		}
 		fReader.setSafeToUse(false);
 		fReaderAcquisitionState = ReaderAcquisitionState.RELEASED;
@@ -967,7 +968,7 @@ public class GenericCommandClientServer<T>
 
 	private synchronized void sendHeartbeat() throws IOException
 	{
-		if ( fOpen && !fDone )
+		if ( fOpen && !fDone && !readerIsAcquired() )
 		{
 			sendToClient(fHeartbeatMessage);
 			flush();
@@ -1280,18 +1281,15 @@ public class GenericCommandClientServer<T>
 					long 		now = System.currentTimeMillis();
 					for ( final GenericCommandClientServer<?> gen : fAll.keySet() )
 					{
-						if ( !gen.readerIsAcquired() )
+						if ( (now - gen.fLastFlushTicks) >= HEARTBEAT_TICKS )
 						{
-							if ( (now - gen.fLastFlushTicks) >= HEARTBEAT_TICKS )
+							try
 							{
-								try
-								{
-									gen.sendHeartbeat();
-								}
-								catch ( IOException dummy )
-								{
-									gen.close();
-								}
+								gen.sendHeartbeat();
+							}
+							catch ( IOException dummy )
+							{
+								gen.close();
 							}
 						}
 					}
@@ -1324,7 +1322,7 @@ public class GenericCommandClientServer<T>
 	private final mode 										fMode;
 	private final Socket 									fSocket;
 	private final ServerSocket 								fServerSocket;
-	private final LineReader fIn;
+	private final LineReader 								fIn;
 	private final OutputStream 								fOut;
 	private final GenericCommandClientServer<T> 			fParentServer;
 	private final String 									fConnectedToAddress;
