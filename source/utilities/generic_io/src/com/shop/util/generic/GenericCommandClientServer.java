@@ -15,9 +15,9 @@
  */
 package com.shop.util.generic;
 
-import com.shop.util.chunked.ChunkedByteArray;
 import com.shop.util.LineReader;
 import com.shop.util.SSLSocketMaker;
+import com.shop.util.chunked.ChunkedByteArray;
 import javax.net.ssl.SSLException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -32,13 +32,16 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * General purpose TCP/IP server and client.<br>
@@ -308,9 +311,19 @@ public class GenericCommandClientServer<T>
 		}
 	}
 
+	/**
+	 * POJO returned by {@link GenericCommandClientServer#sendFlushWaitReceiveAcquireReader(String[])} 
+	 */
 	public static class AcquireReaderData
 	{
+		/**
+		 * The first line returned
+		 */
 		public final String								line;
+
+		/**
+		 * The reader object used to read additional lines/bytes. IMPORTANT: {@link GenericCommandClientServerReader#release()} - MUST be called to release reader
+		 */
 		public final GenericCommandClientServerReader 	reader;
 
 		private AcquireReaderData(String line, GenericCommandClientServerReader reader)
@@ -884,7 +897,7 @@ public class GenericCommandClientServer<T>
 
 	private void clientRunLoop() throws Exception
 	{
-		fAll.put(this, 0);
+		fAll.add(this);
 		try
 		{
 			while ( !fDone )
@@ -1117,14 +1130,14 @@ public class GenericCommandClientServer<T>
 		public InternalNotificationListener(GenericCommandClientServerListener<T> parent_listener)
 		{
 			fParentListener = parent_listener;
-			fLastException = null;
-			fLastLine = null;
+			fLastException = new AtomicReference<Exception>(null);
+			fLastLine = new AtomicReference<String>(null);
 		}
 
 		@Override
 		public void notifyException(GenericCommandClientServer<T> gen, Exception e)
 		{
-			fLastException = e;
+			fLastException.set(e);
 			internalNotify();
 		}
 
@@ -1146,7 +1159,7 @@ public class GenericCommandClientServer<T>
 		@Override
 		public void notifyClientServerClosed(GenericCommandClientServer<T> gen)
 		{
-			fLastLine = null;
+			fLastLine.set("");
 			internalNotify();
 		}
 
@@ -1156,8 +1169,9 @@ public class GenericCommandClientServer<T>
 			if ( line == null )
 			{
 				System.out.println("Null line");
+				line = "";
 			}
-			fLastLine = line;
+			fLastLine.set(line);
 			internalNotify();
 		}
 
@@ -1175,17 +1189,17 @@ public class GenericCommandClientServer<T>
 
 		public Exception getLastException()
 		{
-			return fLastException;
+			return fLastException.get();
 		}
 
 		public String getLastLine()
 		{
-			return fLastLine;
+			return fLastLine.get();
 		}
 
 		private final GenericCommandClientServerListener<T> fParentListener;
-		private volatile Exception 							fLastException;
-		private volatile String 							fLastLine;
+		private final AtomicReference<Exception> 			fLastException;
+		private final AtomicReference<String> 				fLastLine;
 	}
 
 	private class InternalReader implements GenericCommandClientServerReader
@@ -1264,7 +1278,7 @@ public class GenericCommandClientServer<T>
 		}
 	);
 
-	private static final ConcurrentHashMap<GenericCommandClientServer<?>, Integer> 	fAll = new ConcurrentHashMap<GenericCommandClientServer<?>, Integer>();
+	private static final Set<GenericCommandClientServer<?>> fAll = Collections.newSetFromMap(new ConcurrentHashMap());
 
 	private static final Thread 		fHeartbeatThread = new Thread()
 	{
@@ -1279,7 +1293,7 @@ public class GenericCommandClientServer<T>
 					Thread.sleep(HEARTBEAT_SLEEP_TICKS);
 
 					long 		now = System.currentTimeMillis();
-					for ( final GenericCommandClientServer<?> gen : fAll.keySet() )
+					for ( final GenericCommandClientServer<?> gen : fAll )
 					{
 						if ( (now - gen.fLastFlushTicks) >= HEARTBEAT_TICKS )
 						{
