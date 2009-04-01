@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 SHOP.COM
+ * Copyright 2008-2009 SHOP.COM
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,72 +13,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.shop.cache.imp.server;
 
-import com.shop.util.chunked.ChunkedByteArray;
-import com.shop.util.generic.GenericCommandClientServer;
-import com.shop.util.generic.GenericCommandClientServerReader;
 import com.shop.cache.api.commands.SCCommand;
 import com.shop.cache.api.commands.SCDataBuilder;
 import com.shop.cache.api.commands.SCDataBuilderTypeAndCount;
 import com.shop.cache.api.commands.SCSetOfCommands;
 import com.shop.cache.api.server.SCConnection;
+import com.shop.util.chunked.ChunkedByteArray;
+import com.shop.util.generic.GenericIOClient;
+import com.shop.util.generic.GenericIOLineProcessor;
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * SHOP.COM's Server Connection implementation
- *
  * @author Jordan Zimmerman
  */
-class ImpSCServerConnection implements SCConnection
+class ImpSCServerConnection implements SCConnection, GenericIOLineProcessor.AcceptLine<ImpSCServerConnection>
 {
-	ImpSCServerConnection(ImpSCServer server, GenericCommandClientServer<ImpSCServerConnection> connection, boolean monitorMode)
+	ImpSCServerConnection(ImpSCServer server, GenericIOClient<ImpSCServerConnection> client, boolean isMonitorMode)
 	{
 		fServer = server;
-		fConnection = connection;
-		fMonitorMode = monitorMode;
+		fClient = client;
+		fIsMonitorMode = isMonitorMode;
 		fCurrentCommand = null;
+	}
+
+	String 		getCurrentCommand()
+	{
+		return (fCurrentCommand != null) ? fCurrentCommand : "<idle>";
+	}
+
+	@Override
+	public String toString()
+	{
+		return fClient.toString();
 	}
 
 	@Override
 	public boolean isMonitorMode()
 	{
-		return fMonitorMode;
+		return fIsMonitorMode;
 	}
 
 	@Override
-	public void sendObject(ChunkedByteArray obj) throws IOException
+	public void close() throws IOException
 	{
-		fConnection.send((obj != null) ? Integer.toString(obj.size()) : "0");
-		if ( obj != null )
-		{
-			obj.writeTo
-			(
-				new OutputStream()
-				{
-					@Override
-					public void write(int i) throws IOException
-					{
-						byte		b = (byte)(i & 0xff);
-						byte[]		bytes = {b};
-						fConnection.sendBytes(bytes, 0, 1);
-					}
-
-					@Override
-					public void write(byte[] b) throws IOException
-					{
-						fConnection.sendBytes(b, 0, b.length);
-					}
-
-					@Override
-					public void write(byte[] b, int off, int len) throws IOException
-					{
-						fConnection.sendBytes(b, off, len);
-					}
-				}
-			);
-		}
+		fClient.close();
 	}
 
 	@Override
@@ -86,117 +68,118 @@ class ImpSCServerConnection implements SCConnection
 	{
 		for ( String s : v )
 		{
-			fConnection.send(s);
+			fClient.send(s);
 		}
 	}
 
 	@Override
-	public void close() throws IOException
+	public void sendObject(ChunkedByteArray obj) throws IOException
 	{
-		fConnection.close();
+		int 		size = (obj != null) ? obj.size() : 0;
+
+		fClient.send(Integer.toString(size));
+		if ( size > 0 )
+		{
+			obj.writeTo
+			(
+				new OutputStream()
+				{
+					@Override
+					public void write(int b) throws IOException
+					{
+						fClient.sendByte((byte)(b & 0xff));
+					}
+
+					@Override
+					public void write(byte[] b) throws IOException
+					{
+						fClient.sendBytes(b, 0, b.length);
+					}
+
+					@Override
+					public void write(byte[] b, int off, int len) throws IOException
+					{
+						fClient.sendBytes(b, off, len);
+					}
+				}
+			);
+		}
 	}
 
 	@Override
-	public String toString()
+	public void line(GenericIOClient<ImpSCServerConnection> impSCServerConnectionXGenericIOClient, String line) throws Exception
 	{
-		return fConnection.getAddress().getHostName();
+		fCurrentCommand = line;
+		
+		SCCommand 	command = SCSetOfCommands.get(fCurrentCommand);
+		if ( fIsMonitorMode && (command != null) && !command.isMonitorCommand() )
+		{
+			command = null;
+		}
+		if ( command != null )
+		{
+			SCDataBuilder		builder = command.newBuilder();
+			for ( SCDataBuilderTypeAndCount tc : command.getTypesAndCounts() )
+			{
+				switch ( tc.type )
+				{
+					case FIXED_SIZE_VALUE_SET:
+					{
+						for ( int i = 0; i < tc.count; ++i )
+						{
+							builder.addNextValue(fClient.readLine());
+						}
+						break;
+					}
+
+					case BOUNDED_VALUE_SET:
+					{
+						int			lineQty = sizeFromLine(fClient.readLine());
+						for ( int i = 0; i < lineQty; ++i )
+						{
+							builder.addNextValue(fClient.readLine());
+						}
+						break;
+					}
+
+					case OBJECT:
+					{
+						int		size = sizeFromLine(fClient.readLine());
+						if ( size > 0 )
+						{
+							ChunkedByteArray		bytes = fClient.readBytes(size);
+							builder.addNextObject(bytes);
+						}
+						break;
+					}
+
+					case UNBOUNDED_VALUE_SET:
+					{
+						for(;;)
+						{
+							String 		nextLine = fClient.readLine();
+							if ( fCurrentCommand.trim().length() == 0 )
+							{
+								break;
+							}
+							builder.addNextValue(nextLine);
+						}
+						break;
+					}
+				}
+			}
+
+			builder.executeCommand(fServer, this);
+			fClient.flush();
+		}
+
+		fCurrentCommand = null;
 	}
 
-	String 		getCurrentCommand()
+	@Override
+	public void notifyException(Exception e)
 	{
-		return (fCurrentCommand != null) ? fCurrentCommand.name : "<idle>";
-	}
-
-	void receiveLine(String line, GenericCommandClientServerReader reader) throws Exception
-	{
-		if ( fCurrentCommand == null )
-		{
-			SCCommand 		newCommand = SCSetOfCommands.get(line);
-			if ( fMonitorMode && (newCommand != null) && !newCommand.isMonitorCommand() )
-			{
-				newCommand = null;
-			}
-			if ( newCommand != null )
-			{
-				fServer.incrementTransactionCount();
-
-				fCurrentCommand = new CommandState();
-				fCurrentCommand.name = line;
-				fCurrentCommand.command = newCommand;
-				fCurrentCommand.builder = newCommand.newBuilder();
-				fCurrentCommand.tAndCIndex = 0;
-				fCurrentCommand.workIndex = 0;
-				fCurrentCommand.remainingBounded = null;
-			}
-		}
-		else
-		{
-			SCDataBuilderTypeAndCount 		currentTandC = fCurrentCommand.command.getTypesAndCounts().get(fCurrentCommand.tAndCIndex);
-			switch ( currentTandC.type )
-			{
-				case FIXED_SIZE_VALUE_SET:
-				{
-					fCurrentCommand.builder.addNextValue(line);
-					if ( ++fCurrentCommand.workIndex >= currentTandC.count )
-					{
-						++fCurrentCommand.tAndCIndex;
-					}
-					break;
-				}
-
-				case BOUNDED_VALUE_SET:
-				{
-					if ( fCurrentCommand.remainingBounded == null )
-					{
-						fCurrentCommand.remainingBounded = sizeFromLine(line);
-					}
-					else
-					{
-						fCurrentCommand.builder.addNextValue(line);
-						--fCurrentCommand.remainingBounded;
-					}
-
-					if ( fCurrentCommand.remainingBounded <= 0 )
-					{
-						fCurrentCommand.remainingBounded = null;
-						++fCurrentCommand.tAndCIndex;
-					}
-					break;
-				}
-
-				case OBJECT:
-				{
-					++fCurrentCommand.tAndCIndex;
-					int		size = sizeFromLine(line);
-					if ( size > 0 )
-					{
-						ChunkedByteArray		bytes = reader.readBytes(size);
-						fCurrentCommand.builder.addNextObject(bytes);
-					}
-					break;
-				}
-
-				case UNBOUNDED_VALUE_SET:
-				{
-					if ( line.trim().length() > 0 )
-					{
-						fCurrentCommand.builder.addNextValue(line);
-					}
-					else
-					{
-						++fCurrentCommand.tAndCIndex;
-					}
-					break;
-				}
-			}
-		}
-
-		if ( (fCurrentCommand != null) && (fCurrentCommand.tAndCIndex >= fCurrentCommand.command.getTypesAndCounts().size()) )
-		{
-			fCurrentCommand.builder.executeCommand(fServer, this);
-			fCurrentCommand = null;
-			fConnection.flush();
-		}
+		fServer.notifyException(e);
 	}
 
 	private int sizeFromLine(String line)
@@ -214,18 +197,8 @@ class ImpSCServerConnection implements SCConnection
 		return size;
 	}
 
-	private static class CommandState
-	{
-		String			name;
-		SCCommand		command;
-		SCDataBuilder 	builder;
-		int 			tAndCIndex;
-		int				workIndex;
-		Integer			remainingBounded;
-	}
-
-	private final ImpSCServer 										fServer;
-	private final GenericCommandClientServer<ImpSCServerConnection>	fConnection;
-	private final boolean 											fMonitorMode;
-	private CommandState											fCurrentCommand;
+	private final ImpSCServer 								fServer;
+	private final GenericIOClient<ImpSCServerConnection> 	fClient;
+	private final boolean 									fIsMonitorMode;
+	private volatile String									fCurrentCommand;
 }

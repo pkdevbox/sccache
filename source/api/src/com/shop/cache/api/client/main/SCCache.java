@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 SHOP.COM
+ * Copyright 2008-2009 SHOP.COM
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class SCCache
 	/**
 	 * The current release number
 	 */
-	public static final String 		VERSION_NUMBER = "0.6";
+	public static final String 		VERSION_NUMBER = "0.7";
 
 	/**
 	 * Create a cache instance using the given manager

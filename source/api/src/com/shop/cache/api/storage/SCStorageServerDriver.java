@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 SHOP.COM
+ * Copyright 2008-2009 SHOP.COM
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ public interface SCStorageServerDriver extends SCLoggable
 	 *
 	 * @param e the exception
 	 */
-	public void 		handleException(Exception e);
+	public void 		notifyException(Exception e);
 
 	/**
 	 * Set the error state. IMPORTANT: Setting the error state will cause a shutdown of the non-monitor server
