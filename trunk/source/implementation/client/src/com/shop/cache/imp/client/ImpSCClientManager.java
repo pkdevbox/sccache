@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 SHOP.COM
+ * Copyright 2008-2009 SHOP.COM
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,16 @@ import com.shop.cache.api.client.io.SCClient;
 import com.shop.cache.api.client.io.SCClientContext;
 import com.shop.cache.api.client.io.SCClientManager;
 import com.shop.cache.api.common.SCDataSpec;
+import com.shop.cache.api.common.SCGroup;
 import com.shop.cache.api.common.SCGroupSpec;
 import com.shop.cache.api.common.SCNotifications;
-import com.shop.cache.api.common.SCGroup;
-import com.shop.cache.imp.common.ImpSCUtils;
 import com.shop.util.chunked.ChunkedByteArray;
-import com.shop.util.generic.GenericCommandClientServer;
-import com.shop.util.generic.GenericCommandClientServerPool;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.List;
+import com.shop.util.generic.GenericIOClient;
+import com.shop.util.generic.GenericIOClientPool;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * SHOP.COM's Client Manager implementation
@@ -42,22 +42,7 @@ class ImpSCClientManager implements SCClientManager
 		fContext = context;
 		fLastException = new AtomicReference<Exception>(null);
 
-		fPool = new GenericCommandClientServerPool<ImpSCClient>(fContext.getAddress().getHostName(), fContext.getAddress().getPort(), ImpSCClient.getListener(), false, GenericCommandClientServerPool.DEFAULT_RETRY_CONNECTION_TICKS, GenericCommandClientServerPool.DEFAULT_KEEP_ALIVE_TICKS);
-		fPool.setIdleNotificationTimeout(ImpSCUtils.IDLE_NOTIFICATION_TICKS);
-		fPool.setNewConnectionStarter
-		(
-			new GenericCommandClientServerPool.NewConnectionStarter<ImpSCClient>()
-			{
-				@Override
-				public void startNewConnection(GenericCommandClientServer<ImpSCClient> client) throws Exception
-				{
-					ImpSCClient 		localClient = new ImpSCClient(ImpSCClientManager.this, client, fContext);
-					client.setUserValue(localClient);
-					client.start();
-					localClient.hello();
-				}
-			}
-		);
+		fPool = new GenericIOClientPool<ImpSCClient>(fContext.getAddress(), false, GenericIOClientPool.DEFAULT_RETRY_CONNECTION_TICKS, GenericIOClientPool.DEFAULT_KEEP_ALIVE_TICKS);
 	}
 
 	@Override
@@ -251,10 +236,12 @@ class ImpSCClientManager implements SCClientManager
 	public SCClient getClient() throws Exception
 	{
 		ImpSCClient client = null;
+		GenericIOClient<ImpSCClient> 	internalClient = null;
 		try
 		{
-			GenericCommandClientServer<ImpSCClient> 	gen = fPool.get(null);
-			if ( gen == null )
+			AtomicBoolean 					isNew = new AtomicBoolean();
+			internalClient = fPool.get(isNew);
+			if ( internalClient == null )
 			{
 				if ( fPool.isOpen() )
 				{
@@ -263,12 +250,26 @@ class ImpSCClientManager implements SCClientManager
 			}
 			else
 			{
-				client = gen.getUserValue();
+				if ( isNew.get() )
+				{
+					client = new ImpSCClient(this, internalClient, fContext);
+					internalClient.setUserValue(client);
+					client.hello();
+				}
+				else
+				{
+					client = internalClient.getUserValue();
+				}
 			}
 		}
 		catch ( Exception e )
 		{
 			registerException(e);
+			if ( internalClient != null )
+			{
+				fPool.releaseAndClose(internalClient);
+			}
+			client = null;
 		}
 
 		return client;
@@ -290,8 +291,8 @@ class ImpSCClientManager implements SCClientManager
 				throw new IllegalArgumentException("Only clients allocated via getClient() can be released.");
 			}
 
-			ImpSCClient 		impClient = (ImpSCClient)client;
-			fPool.release(impClient.getGen());
+			ImpSCClient impClient = (ImpSCClient)client;
+			fPool.release(impClient.getClient());
 		}
 	}
 
@@ -318,7 +319,7 @@ class ImpSCClientManager implements SCClientManager
 		}
 	}
 
-	private final SCClientContext 								fContext;
-	private final AtomicReference<Exception> 					fLastException;
-	private final GenericCommandClientServerPool<ImpSCClient> 	fPool;
+	private final SCClientContext 						fContext;
+	private final AtomicReference<Exception> 			fLastException;
+	private final GenericIOClientPool<ImpSCClient> 	fPool;
 }

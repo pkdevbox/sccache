@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 SHOP.COM
+ * Copyright 2008-2009 SHOP.COM
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ class CCDB2Storage implements SCStorage, CCDB2Driver
 			}
 
 			@Override
-			public void handleException(Exception e)
+			public void notifyException(Exception e)
 			{
 				// do nothing
 			}
@@ -119,7 +119,7 @@ class CCDB2Storage implements SCStorage, CCDB2Driver
 	@Override
 	public void handleException(Exception e)
 	{
-		fDriver.handleException(e);
+		fDriver.notifyException(e);
 	}
 
 	@Override

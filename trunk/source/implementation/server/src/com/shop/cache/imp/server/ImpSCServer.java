@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 SHOP.COM
+ * Copyright 2008-2009 SHOP.COM
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.shop.cache.imp.server;
 
-import com.shop.util.chunked.ChunkedByteArray;
-import com.shop.util.generic.GenericCommandClientServer;
-import com.shop.util.generic.GenericCommandClientServerListener;
-import com.shop.util.generic.GenericCommandClientServerReader;
-import com.shop.cache.api.storage.SCStorage;
-import com.shop.cache.api.storage.SCStorageServerDriver;
-import com.shop.cache.api.server.SCServer;
-import com.shop.cache.api.server.SCServerContext;
 import com.shop.cache.api.common.SCDataSpec;
 import com.shop.cache.api.common.SCGroup;
 import com.shop.cache.api.common.SCGroupSpec;
 import com.shop.cache.api.common.SCNotifications;
+import com.shop.cache.api.server.SCServer;
+import com.shop.cache.api.server.SCServerContext;
+import com.shop.cache.api.storage.SCStorage;
+import com.shop.cache.api.storage.SCStorageServerDriver;
 import com.shop.cache.imp.common.ImpSCUtils;
+import com.shop.util.chunked.ChunkedByteArray;
+import com.shop.util.generic.GenericIOClient;
+import com.shop.util.generic.GenericIOLineProcessor;
+import com.shop.util.generic.GenericIOFactory;
+import com.shop.util.generic.GenericIOServer;
+import com.shop.util.generic.GenericIOServerListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,15 +70,15 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 		}
 		fLogFile = logFile;
 
-		fServer = GenericCommandClientServer.makeServer(new InternalListener(false), context.getPort(), false);
+		fServer = GenericIOFactory.makeServer(new InternalListener(false), context.getPort(), false);
 
-		GenericCommandClientServer<ImpSCServerConnection> 		server = null;
+		GenericIOServer<ImpSCServerConnection> 		monitor = null;
 		if ( fContext.getMonitorPort() != 0 )
 		{
-			server = GenericCommandClientServer.makeServer(new InternalListener(true), context.getMonitorPort(), false);
+			monitor = GenericIOFactory.makeServer(new InternalListener(true), context.getMonitorPort(), false);
 			System.out.println("Monitor active on port " + context.getMonitorPort());
 		}
-		fMonitor = server;
+		fMonitor = monitor;
 
 		fTransactionCount = new AtomicLong(0);
 
@@ -123,7 +124,7 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 	}
 
 	@Override
-	public void handleException(Exception e)
+	public void notifyException(Exception e)
 	{
 		ImpSCUtils.handleException(e, this);
 	}
@@ -190,12 +191,12 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 	@Override
 	public List<String> getConnectionList()
 	{
-		List<String>												tab = new ArrayList<String>();
-		List<GenericCommandClientServer<ImpSCServerConnection>> 	clients = fServer.getClients();
+		List<String>									tab = new ArrayList<String>();
+		List<GenericIOClient<ImpSCServerConnection>> 	clients = fServer.getClients();
 		tab.add(clients.size() + " client(s)");
 
 		int			index = 0;
-		for ( GenericCommandClientServer<ImpSCServerConnection> connection : clients )
+		for ( GenericIOClient<ImpSCServerConnection> connection : clients )
 		{
 			tab.add(++index + ". " + connection.getUserValue().toString() + " - " + connection.getUserValue().getCurrentCommand());
 		}
@@ -223,7 +224,6 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 		{
 			fIsDone = true;
 			fServer.close();
-			fServer.waitForClose();
 		}
 		notifyAll();
 	}
@@ -507,26 +507,19 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 		if ( (fMonitor != null) && (fErrorState == null) )
 		{
 			fMonitor.close();
-			fMonitor.waitForClose();
 		}
 	}
 
-	private class InternalListener implements GenericCommandClientServerListener<ImpSCServerConnection>
+	private class InternalListener implements GenericIOServerListener<ImpSCServerConnection>
 	{
-		InternalListener(boolean monitorMode)
+		public InternalListener(boolean isMonitor)
 		{
-			fMonitorMode = monitorMode;
+			fIsMonitor = isMonitor;
 		}
 
 		@Override
-		public void notifyIdle(GenericCommandClientServer<ImpSCServerConnection> client)
+		public void notifyException(GenericIOServer<ImpSCServerConnection> server, Exception e)
 		{
-		}
-
-		@Override
-		public void notifyException(GenericCommandClientServer<ImpSCServerConnection> gen, Exception e)
-		{
-			gen.close();
 			if ( !ImpSCUtils.handleException(e, ImpSCServer.this) )
 			{
 				fAbnormalCloses.incrementAndGet();
@@ -534,46 +527,16 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 		}
 
 		@Override
-		public void notifyClientAccepted(GenericCommandClientServer<ImpSCServerConnection> server, GenericCommandClientServer<ImpSCServerConnection> connection)
+		public void notifyClientAccepted(GenericIOServer<ImpSCServerConnection> server, GenericIOClient<ImpSCServerConnection> client) throws Exception
 		{
-			connection.changeHeartbeat(fContext.getHeartbeat());
-			
-			ImpSCServerConnection 	scConnection = new ImpSCServerConnection(ImpSCServer.this, connection, fMonitorMode);
-			connection.setUserValue(scConnection);
+			ImpSCServerConnection connection = new ImpSCServerConnection(ImpSCServer.this, client, fIsMonitor);
+			client.setUserValue(connection);
+
+			GenericIOLineProcessor<ImpSCServerConnection> processor = new GenericIOLineProcessor<ImpSCServerConnection>(client, connection);
+			processor.execute();
 		}
 
-		@Override
-		public void notifyClientServerClosed(GenericCommandClientServer<ImpSCServerConnection> gen)
-		{
-			if ( gen.isServer() )
-			{
-				if ( !fMonitorMode )
-				{
-					shutdown();
-				}
-			}
-		}
-
-		@Override
-		public void notifyLineReceived(GenericCommandClientServer<ImpSCServerConnection> gen, String line, GenericCommandClientServerReader reader) throws Exception
-		{
-			assert gen.getUserValue() != null;
-			gen.getUserValue().receiveLine(line, reader);
-		}
-
-		@Override
-		public InputStream notifyCreatingInputStream(GenericCommandClientServer<ImpSCServerConnection> client, InputStream in) throws Exception
-		{
-			return in;
-		}
-
-		@Override
-		public OutputStream notifyCreatingOutputStream(GenericCommandClientServer<ImpSCServerConnection> client, OutputStream out) throws Exception
-		{
-			return out;
-		}
-
-		private final boolean 	fMonitorMode;
+		private final boolean fIsMonitor;
 	}
 
 	private static final TrackerTimer.data 		fGetTimerData = new TrackerTimer.data("Gets");
@@ -581,13 +544,13 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 
 	private static final int				LAST_GET_TIMES_QTY = 500;
 
-	private static final String 			CHECKIN_VERSION = "1.1";
+	private static final String 			CHECKIN_VERSION = "1.2";
 
 	private final SCServerContext 										fContext;
-	private final SCStorage fDatabase;
+	private final SCStorage 											fDatabase;
 	private final AtomicInteger 										fAbnormalCloses;
-	private final GenericCommandClientServer<ImpSCServerConnection> 	fServer;
-	private final GenericCommandClientServer<ImpSCServerConnection>		fMonitor;
+	private final GenericIOServer<ImpSCServerConnection> 				fServer;
+	private final GenericIOServer<ImpSCServerConnection>				fMonitor;
 	private final AtomicReferenceArray<String>							fLastGetTimes;
 	private	final AtomicInteger											fLastGetTimesIndex;
 	private	final Date 													fDumpPinPoint;

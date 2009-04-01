@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 SHOP.COM
+ * Copyright 2008-2009 SHOP.COM
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +23,14 @@ import com.shop.cache.api.common.SCDataSpec;
 import com.shop.cache.api.common.SCGroup;
 import com.shop.cache.api.common.SCGroupSpec;
 import com.shop.cache.api.common.SCNotifications;
-import com.shop.cache.imp.common.ImpSCClosedConnectionException;
-import com.shop.cache.imp.common.ImpSCUtils;
 import com.shop.util.chunked.ChunkedByteArray;
-import com.shop.util.generic.GenericCommandClientServer;
-import com.shop.util.generic.GenericCommandClientServerListener;
-import com.shop.util.generic.GenericCommandClientServerReader;
+import com.shop.util.generic.GenericIOClient;
+import com.shop.util.generic.GenericIOFactory;
+import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * SHOP.COM's Client implementation
@@ -96,9 +91,9 @@ class ImpSCClient implements SCClient
 	{
 		try
 		{
-			fIsWaitingForResponse = true;
-			fGen.sendFlushWaitReceive(SCSetOfCommands.getCommandName(SCCommandKeyDump.class), fPath);	// ignore the result
-			fIsWaitingForResponse = false;
+			fClient.send(SCSetOfCommands.getCommandName(SCCommandKeyDump.class));
+			fClient.send(fPath);
+			fClient.flush();
 		}
 		catch ( Exception e )
 		{
@@ -117,9 +112,10 @@ class ImpSCClient implements SCClient
 
 		try
 		{
-			fIsWaitingForResponse = true;
-			String		result = fGen.sendFlushWaitReceive(SCSetOfCommands.getCommandName(SCCommandGetObjectTTL.class), key);
-			fIsWaitingForResponse = false;
+			fClient.send(SCSetOfCommands.getCommandName(SCCommandGetObjectTTL.class));
+			fClient.send(key);
+			fClient.flush();
+			String		result = fClient.readLine();
 
 			return safeParseLong(result);
 		}
@@ -136,7 +132,14 @@ class ImpSCClient implements SCClient
 	@Override
 	public void close()
 	{
-		fGen.close();
+		try
+		{
+			fClient.close();
+		}
+		catch ( IOException e )
+		{
+			// ignore
+		}
 	}
 
 	@Override
@@ -144,9 +147,8 @@ class ImpSCClient implements SCClient
 	{
 		try
 		{
-			fIsWaitingForResponse = true;
-			fGen.sendFlushWaitReceive(SCSetOfCommands.getCommandName(SCCommandHello.class));
-			fIsWaitingForResponse = false;
+			fClient.send(SCSetOfCommands.getCommandName(SCCommandHello.class));
+			fClient.flush();
 		}
 		catch ( Exception e )
 		{
@@ -175,9 +177,9 @@ class ImpSCClient implements SCClient
 	{
 		try
 		{
-			fGen.send(SCSetOfCommands.getCommandName(SCCommandKeyDump.class));
-			fGen.send(remoteFilename);
-			fGen.flush();
+			fClient.send(SCSetOfCommands.getCommandName(SCCommandKeyDump.class));
+			fClient.send(remoteFilename);
+			fClient.flush();
 		}
 		catch ( IOException e )
 		{
@@ -202,35 +204,18 @@ class ImpSCClient implements SCClient
 
 		try
 		{
-			fIsWaitingForResponse = true;
-			fLastLineReceivedTicks = 0;
+			ChunkedByteArray	bytes = null;
+			
+			String 				commandName = SCSetOfCommands.getCommandName(ignoreTTL ? SCCommandGetObjectIgnoreTTL.class : SCCommandGetObject.class);
+			fClient.send(commandName);
+			fClient.send(key);
+			fClient.flush();
 
-			ChunkedByteArray bytes = null;
-			GenericCommandClientServerReader 	reader = null;
-			try
+			int			size = safeParseInt(fClient.readLine());
+			if ( size > 0 )
 			{
-				String 			commandName = SCSetOfCommands.getCommandName(ignoreTTL ? SCCommandGetObjectIgnoreTTL.class : SCCommandGetObject.class);
-				GenericCommandClientServer.AcquireReaderData 	readerPair = fGen.sendFlushWaitReceiveAcquireReader(commandName, key);
-				reader = readerPair.reader;
-
-				int			size = safeParseInt(readerPair.line);
-				if ( size > 0 )
-				{
-					bytes = reader.readBytes(size);
-				}
+				bytes = fClient.readBytes(size);
 			}
-			catch ( InterruptedException dummy )
-			{
-				Thread.currentThread().interrupt();
-			}
-			finally
-			{
-				if ( reader != null )
-				{
-					reader.release();
-				}
-			}
-			fIsWaitingForResponse = false;
 
 			if ( (bytes == null) || (bytes.size() == 0) )
 			{
@@ -268,25 +253,25 @@ class ImpSCClient implements SCClient
 
 		try
 		{
-			fGen.send(SCSetOfCommands.getCommandName(SCCommandPutObject.class));
-			fGen.send(key);
-			fGen.send(Long.toString(spec.ttl));
+			fClient.send(SCSetOfCommands.getCommandName(SCCommandPutObject.class));
+			fClient.send(key);
+			fClient.send(Long.toString(spec.ttl));
 			if ( groups != null )
 			{
-				fGen.send(Integer.toString(groups.size()));
+				fClient.send(Integer.toString(groups.size()));
 				for ( SCGroup g : groups )
 				{
-					fGen.send(g.toString());
+					fClient.send(g.toString());
 				}
 			}
 			else
 			{
-				fGen.send("0");
+				fClient.send("0");
 			}
 
 			writeObject(spec);
 
-			fGen.flush();
+			fClient.flush();
 		}
 		catch ( IOException e )
 		{
@@ -305,9 +290,9 @@ class ImpSCClient implements SCClient
 
 		try
 		{
-			fGen.send(SCSetOfCommands.getCommandName(SCCommandRemoveObject.class));
-			fGen.send(key);
-			fGen.flush();
+			fClient.send(SCSetOfCommands.getCommandName(SCCommandRemoveObject.class));
+			fClient.send(key);
+			fClient.flush();
 		}
 		catch ( IOException e )
 		{
@@ -319,27 +304,17 @@ class ImpSCClient implements SCClient
 		}
 	}
 
-	static GenericCommandClientServerListener<ImpSCClient> getListener()
-	{
-		return fListener;
-	}
-
-	ImpSCClient(SCClientManager manager, GenericCommandClientServer<ImpSCClient> gen, SCClientContext context) throws IOException
+	ImpSCClient(SCClientManager manager, GenericIOClient<ImpSCClient> client, SCClientContext context) throws IOException
 	{
 		fManager = manager;
-		fContext = (context != null) ? context : (((gen != null) && (gen.getUserValue() != null)) ? gen.getUserValue().fContext : null);
-		fIsWaitingForResponse = false;
+		fContext = (context != null) ? context : (((client != null) && (client.getUserValue() != null)) ? client.getUserValue().fContext : null);
 
-		fPutKeyQueue = new AtomicReference<LinkedBlockingQueue<PutEntry>>();
-
-		if ( gen == null )
+		if ( client == null )
 		{
 			try
 			{
-				gen = GenericCommandClientServer.makeClient(fListener, fContext.getAddress().getHostName(), fContext.getAddress().getPort(), false);
-				gen.setUserValue(this);
-				gen.setIdleNotificationTimeout(ImpSCUtils.IDLE_NOTIFICATION_TICKS);
-				gen.start();
+				client = GenericIOFactory.makeClient(fContext.getAddress().getHostName(), fContext.getAddress().getPort(), false);
+				client.setUserValue(this);
 			}
 			catch ( Exception e )
 			{
@@ -351,13 +326,12 @@ class ImpSCClient implements SCClient
 			}
 		}
 
-		fGen = gen;
-		fGen.changeHeartbeat(fContext.getHeartbeat());
+		fClient = client;
 	}
 
-	GenericCommandClientServer<ImpSCClient>	getGen()
+	GenericIOClient<ImpSCClient>	getClient()
 	{
-		return fGen;
+		return fClient;
 	}
 
 	private List<String> standardCommandUntilBlankLine(Class<? extends SCCommand> commandClass, String argument) throws Exception
@@ -366,18 +340,26 @@ class ImpSCClient implements SCClient
 		List<String>		tab = new ArrayList<String>();
 		try
 		{
-			fIsWaitingForResponse = true;
-			GenericCommandClientServer.AcquireReaderData 	data;
+			fClient.send(commandName);
 			if ( argument != null )
 			{
-				data = fGen.sendFlushWaitReceiveAcquireReader(commandName, argument);
+				fClient.send(argument);
 			}
-			else
+			fClient.flush();
+
+			for(;;)
 			{
-				data = fGen.sendFlushWaitReceiveAcquireReader(commandName);
+				String	line = fClient.readLine();
+				if ( line == null )
+				{
+					throw new EOFException();
+				}
+				if ( line.length() == 0 )
+				{
+					break;
+				}
+				tab.add(line);
 			}
-			getUntilBlankLine(data, tab);
-			fIsWaitingForResponse = false;
 		}
 		catch ( Exception e )
 		{
@@ -388,23 +370,6 @@ class ImpSCClient implements SCClient
 			throw e;
 		}
 		return tab;
-	}
-
-	private void getUntilBlankLine(GenericCommandClientServer.AcquireReaderData data, List<String> tab) throws IOException
-	{
-		try
-		{
-			String		line = data.line;
-			while ( line.length() > 0 )
-			{
-				tab.add(line);
-				line = data.reader.readLine();
-			}
-		}
-		finally
-		{
-			data.reader.release();
-		}
 	}
 
 	private static int safeParseInt(String s)
@@ -439,13 +404,13 @@ class ImpSCClient implements SCClient
 	{
 		if ( (spec == null) || (spec.data == null) )
 		{
-			fGen.send("0");
+			fClient.send("0");
 		}
 		else
 		{
 			int 			size = spec.data.size();
 
-			fGen.send(Integer.toString(size));
+			fClient.send(Integer.toString(size));
 			spec.data.writeTo
 			(
 				new OutputStream()
@@ -455,19 +420,19 @@ class ImpSCClient implements SCClient
 					{
 						byte		b = (byte)(i & 0xff);
 						byte[]		bytes = {b};
-						fGen.sendBytes(bytes, 0, 1);
+						fClient.sendBytes(bytes, 0, 1);
 					}
 
 					@Override
 					public void write(byte[] b) throws IOException
 					{
-						fGen.sendBytes(b, 0, b.length);
+						fClient.sendBytes(b, 0, b.length);
 					}
 
 					@Override
 					public void write(byte[] b, int off, int len) throws IOException
 					{
-						fGen.sendBytes(b, off, len);
+						fClient.sendBytes(b, off, len);
 					}
 				}
 			);
@@ -478,8 +443,8 @@ class ImpSCClient implements SCClient
 	{
 		try
 		{
-			fGen.send(SCSetOfCommands.getCommandName(commandClass));
-			fGen.flush();
+			fClient.send(SCSetOfCommands.getCommandName(commandClass));
+			fClient.flush();
 		}
 		catch ( IOException e )
 		{
@@ -526,84 +491,7 @@ class ImpSCClient implements SCClient
 		}
 	}
 
-	private static final GenericCommandClientServerListener<ImpSCClient> fListener = new GenericCommandClientServerListener<ImpSCClient>()
-	{
-		@Override
-		public void notifyException(GenericCommandClientServer<ImpSCClient> gen, Exception e)
-		{
-			ImpSCClient localClient = gen.getUserValue();
-			if ( localClient != null )
-			{
-				if ( localClient.fManager != null )
-				{
-					localClient.fManager.registerException(e);
-				}
-			}
-			gen.close();
-		}
-
-		@Override
-		public void notifyIdle(GenericCommandClientServer<ImpSCClient> gen)
-		{
-			ImpSCClient localClient = gen.getUserValue();
-			if ( (localClient != null) && localClient.fIsWaitingForResponse )
-			{
-				notifyException(gen, new ImpSCClosedConnectionException("read timeout"));
-			}
-		}
-
-		@Override
-		public void notifyClientAccepted(GenericCommandClientServer<ImpSCClient> server, GenericCommandClientServer<ImpSCClient> client)
-		{
-		}
-
-		@Override
-		public void notifyClientServerClosed(GenericCommandClientServer<ImpSCClient> gen)
-		{
-			ImpSCClient		local_client = gen.getUserValue();
-			if ( local_client != null )
-			{
-				LinkedBlockingQueue<PutEntry> 		local_put_queue = local_client.fPutKeyQueue.getAndSet(null);
-				if ( local_put_queue != null )
-				{
-					local_put_queue.add(new PutEntry(null));	// signal the end
-				}
-			}
-		}
-
-		@Override
-		public void notifyLineReceived(GenericCommandClientServer<ImpSCClient> gen, String line, GenericCommandClientServerReader reader) throws Exception
-		{
-			ImpSCClient 		localClient = gen.getUserValue();
-			if ( localClient.fLastLineReceivedTicks == 0 )
-			{
-				localClient.fLastLineReceivedTicks = System.currentTimeMillis();
-			}
-
-			LinkedBlockingQueue<PutEntry> 	localPutQueue = localClient.fPutKeyQueue.get();
-			if ( localPutQueue != null )
-			{
-				localPutQueue.add(new PutEntry(line));
-			}
-		}
-
-		@Override
-		public InputStream notifyCreatingInputStream(GenericCommandClientServer<ImpSCClient> client, InputStream in) throws Exception
-		{
-			return in;
-		}
-
-		@Override
-		public OutputStream notifyCreatingOutputStream(GenericCommandClientServer<ImpSCClient> client, OutputStream out) throws Exception
-		{
-			return out;
-		}
-	};
-
-	private final GenericCommandClientServer<ImpSCClient> 			fGen;
-	private final SCClientManager 									fManager;
-	private final SCClientContext 									fContext;
-	private final AtomicReference<LinkedBlockingQueue<PutEntry>> 	fPutKeyQueue;
-	private	volatile boolean 										fIsWaitingForResponse;
-	private	volatile long 											fLastLineReceivedTicks;
+	private final GenericIOClient<ImpSCClient> 		fClient;
+	private final SCClientManager 						fManager;
+	private final SCClientContext 						fContext;
 }
