@@ -45,21 +45,6 @@ class DefaultMemoryCache implements SCMemoryCache
 		fMemoryCacheKeys = Collections.newSetFromMap(new ConcurrentHashMap());
 		fQueue = new ReferenceQueue<SCDataBlock>();
 
-		Thread		queueThread = new Thread
-		(
-			new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					referencePurgeLoop();
-				}
-			},
-			"DefaultMemoryCache reference thread"
-		);
-		queueThread.setDaemon(true);
-		queueThread.start();
-
 		Thread		purgeThread = new Thread
 		(
 			new Runnable()
@@ -79,6 +64,8 @@ class DefaultMemoryCache implements SCMemoryCache
 	@Override
 	public void put(SCDataBlock block)
 	{
+		removeOldReferences();
+
 		fMemoryCache.put(block.getKey(), new SoftReference<SCDataBlock>(block, fQueue));
 		fMemoryCacheKeys.add(block.getKey());
 	}
@@ -86,6 +73,8 @@ class DefaultMemoryCache implements SCMemoryCache
 	@Override
 	public SCDataBlock get(String key)
 	{
+		removeOldReferences();
+
 		SoftReference<SCDataBlock> 		memoryBlockRef = fMemoryCache.get(key);
 		return (memoryBlockRef != null) ? memoryBlockRef.get() : null;
 	}
@@ -140,24 +129,17 @@ class DefaultMemoryCache implements SCMemoryCache
 		}
 	}
 
-	private void referencePurgeLoop()
+	private void removeOldReferences()
 	{
-		try
+		Reference<? extends SCDataBlock> reference;
+		while ( (reference = fQueue.poll()) != null ) 
 		{
-			for(;;)
+			SCDataBlock 						block = reference.get();
+			if ( block != null )
 			{
-				Reference<? extends SCDataBlock>	ref = fQueue.remove();
-				SCDataBlock 						block = ref.get();
-				if ( block != null )
-				{
-					fMemoryCache.remove(block.getKey());
-					fMemoryCacheKeys.remove(block.getKey());
-				}
+				fMemoryCache.remove(block.getKey());
+				fMemoryCacheKeys.remove(block.getKey());
 			}
-		}
-		catch ( InterruptedException e )
-		{
-			Thread.currentThread().interrupt();
 		}
 	}
 

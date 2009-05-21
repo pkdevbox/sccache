@@ -53,15 +53,6 @@ public interface SCServerContext
 	public SCServerContext logPath(File logPath);
 
 	/**
-	 * Change the value used to maintain heartbeats between client and server. NOTE: this must
-	 * be coordinated with the client context
-	 *
-	 * @param s new hearbeat
-	 * @return this
-	 */
-	public SCServerContext heartbeat(String s);
-
-	/**
 	 * Returns the main server port
 	 *
 	 * @return port
@@ -81,11 +72,4 @@ public interface SCServerContext
 	 * @return path or null
 	 */
 	public File 	getLogPath();
-
-	/**
-	 * Returns the currently set heartbeat
-	 *
-	 * @return heartbeat
-	 */
-	public String	getHeartbeat();
 }

@@ -31,6 +31,7 @@ import com.shop.util.generic.GenericIOLineProcessor;
 import com.shop.util.generic.GenericIOFactory;
 import com.shop.util.generic.GenericIOServer;
 import com.shop.util.generic.GenericIOServerListener;
+import com.shop.util.generic.GenericIOParameters;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -70,12 +71,14 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 		}
 		fLogFile = logFile;
 
-		fServer = GenericIOFactory.makeServer(new InternalListener(false), context.getPort(), false);
+		GenericIOParameters 		parameters = new GenericIOParameters().port(context.getPort()).ssl(false);
+		fServer = GenericIOFactory.makeServer(new InternalListener(false), parameters);
 
 		GenericIOServer<ImpSCServerConnection> 		monitor = null;
 		if ( fContext.getMonitorPort() != 0 )
 		{
-			monitor = GenericIOFactory.makeServer(new InternalListener(true), context.getMonitorPort(), false);
+			GenericIOParameters 		contextParameters = new GenericIOParameters().port(context.getMonitorPort()).ssl(false);
+			monitor = GenericIOFactory.makeServer(new InternalListener(true), contextParameters);
 			System.out.println("Monitor active on port " + context.getMonitorPort());
 		}
 		fMonitor = monitor;

@@ -26,6 +26,7 @@ import com.shop.cache.api.common.SCNotifications;
 import com.shop.util.chunked.ChunkedByteArray;
 import com.shop.util.generic.GenericIOClient;
 import com.shop.util.generic.GenericIOFactory;
+import com.shop.util.generic.GenericIOParameters;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -149,6 +150,7 @@ class ImpSCClient implements SCClient
 		{
 			fClient.send(SCSetOfCommands.getCommandName(SCCommandHello.class));
 			fClient.flush();
+			fClient.readLine();	// hello responds with one line
 		}
 		catch ( Exception e )
 		{
@@ -313,7 +315,8 @@ class ImpSCClient implements SCClient
 		{
 			try
 			{
-				client = GenericIOFactory.makeClient(fContext.getAddress().getHostName(), fContext.getAddress().getPort(), false);
+				GenericIOParameters 	parameters = new GenericIOParameters().port(fContext.getAddress().getPort()).ssl(false);
+				client = GenericIOFactory.makeClient(fContext.getAddress().getHostName(), parameters);
 				client.setUserValue(this);
 			}
 			catch ( Exception e )
@@ -481,17 +484,7 @@ class ImpSCClient implements SCClient
 		return newKey.toString();
 	}
 
-	private static class PutEntry
-	{
-		public final String			key;
-
-		public PutEntry(String key)
-		{
-			this.key = key;
-		}
-	}
-
 	private final GenericIOClient<ImpSCClient> 		fClient;
-	private final SCClientManager 						fManager;
-	private final SCClientContext 						fContext;
+	private final SCClientManager 					fManager;
+	private final SCClientContext 					fContext;
 }

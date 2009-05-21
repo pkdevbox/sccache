@@ -17,7 +17,6 @@ package com.shop.cache.imp.client;
 
 import com.shop.cache.api.client.io.SCClientContext;
 import com.shop.cache.api.common.SCNotifications;
-import com.shop.cache.imp.common.ImpSCUtils;
 import java.net.InetSocketAddress;
 
 /**
@@ -35,22 +34,9 @@ class ImpSCClientContext implements SCClientContext
 	}
 
 	@Override
-	public SCClientContext heartbeat(String s)
-	{
-		fHeartbeat = s;
-		return this;
-	}
-
-	@Override
 	public InetSocketAddress getAddress()
 	{
 		return fAddress;
-	}
-
-	@Override
-	public String getHeartbeat()
-	{
-		return fHeartbeat;
 	}
 
 	@Override
@@ -67,6 +53,5 @@ class ImpSCClientContext implements SCClientContext
 	}
 
 	private InetSocketAddress			fAddress = null;
-	private String						fHeartbeat = ImpSCUtils.DEFAULT_HEARTBEAT;
 	private SCNotifications				fNotifications = null;
 }

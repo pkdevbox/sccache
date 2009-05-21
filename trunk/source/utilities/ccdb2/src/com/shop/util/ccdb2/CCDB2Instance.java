@@ -717,7 +717,7 @@ public class CCDB2Instance implements CCDB2UpdateIndexInterface
 		ChunkedByteArray 		previous = (entry.bytesRef != null) ? entry.bytesRef.get() : null;
 		PendingPutRecord		pendingPut = new PendingPutRecord(key, previous, entry, spec, groupSpecs, addToIndexFile);
 
-		// though this is a SoftReference, a hard reference is help by spec.data in the pending record until it's actually written
+		// though this is a SoftReference, a hard reference is held by spec.data in the pending record until it's actually written
 		entry.bytesRef = new SoftReference<ChunkedByteArray>(spec.data);
 		if ( fPendingPutQueue != null )
 		{
