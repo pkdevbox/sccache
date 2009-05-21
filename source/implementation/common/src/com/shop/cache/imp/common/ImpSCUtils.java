@@ -27,11 +27,6 @@ import java.nio.channels.ClosedByInterruptException;
 public class ImpSCUtils
 {
 	/**
-	 * The default heartbeat used by the client and server.
-	 */
-	public static final String 	DEFAULT_HEARTBEAT = "\t\t^|^|^\t\t";
-
-	/**
 	 * idle ticks used
 	 */
 	public static final int 	IDLE_NOTIFICATION_TICKS = 30000;

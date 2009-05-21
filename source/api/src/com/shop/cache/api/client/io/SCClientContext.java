@@ -35,15 +35,6 @@ public interface SCClientContext
 	public SCClientContext			address(InetSocketAddress address);
 
 	/**
-	 * Change the value used to maintain heartbeats between client and server. NOTE: this must
-	 * be coordinated with the server context
-	 *
-	 * @param s new hearbeat
-	 * @return this
-	 */
-	public SCClientContext 			heartbeat(String s);
-
-	/**
 	 * Set a notification object
 	 *
 	 * @param n new notification object
@@ -57,13 +48,6 @@ public interface SCClientContext
 	 * @return address
 	 */
 	public InetSocketAddress		getAddress();
-
-	/**
-	 * Returns the currently set heartbeat
-	 *
-	 * @return heartbeat
-	 */
-	public String					getHeartbeat();
 
 	/**
 	 * Returns the current notification handler

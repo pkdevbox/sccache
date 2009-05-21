@@ -270,6 +270,11 @@ class ImpSCClientManager implements SCClientManager
 				fPool.releaseAndClose(internalClient);
 			}
 			client = null;
+
+			if ( fPool.isOpen() )
+			{
+				reopen();
+			}
 		}
 
 		return client;

@@ -16,7 +16,6 @@
 package com.shop.cache.imp.server;
 
 import com.shop.cache.api.server.SCServerContext;
-import com.shop.cache.imp.common.ImpSCUtils;
 import java.io.File;
 
 /**
@@ -30,7 +29,6 @@ class ImpSCServerContext implements SCServerContext
 	{
 		fPort = fMonitorPort = 0;
 		fLogPath = null;
-		fHeartbeat = ImpSCUtils.DEFAULT_HEARTBEAT;
 	}
 
 	@Override
@@ -72,21 +70,7 @@ class ImpSCServerContext implements SCServerContext
 		return this;
 	}
 
-	@Override
-	public SCServerContext heartbeat(String s)
-	{
-		fHeartbeat = s;
-		return this;
-	}
-
-	@Override
-	public String getHeartbeat()
-	{
-		return fHeartbeat;
-	}
-
 	private int					fPort;
 	private int					fMonitorPort;
 	private File				fLogPath;
-	private String				fHeartbeat;
 }
