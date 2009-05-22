@@ -158,7 +158,7 @@ class ImpSCServerConnection implements SCConnection, GenericIOLineProcessor.Acce
 						for(;;)
 						{
 							String 		nextLine = fClient.readLine();
-							if ( fCurrentCommand.trim().length() == 0 )
+							if ( nextLine.trim().length() == 0 )
 							{
 								break;
 							}
