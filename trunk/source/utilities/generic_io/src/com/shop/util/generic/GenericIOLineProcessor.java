@@ -72,7 +72,7 @@ public class GenericIOLineProcessor<T>
 				{
 					try
 					{
-						while ( !Thread.currentThread().isInterrupted() )
+						while ( !Thread.currentThread().isInterrupted() && fClient.isOpen() )
 						{
 							String		line = fClient.readLine();
 							if ( line == null )

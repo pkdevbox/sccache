@@ -46,6 +46,7 @@ class GenericIOConstants
 
 	static int					getEscape()
 	{
+		//noinspection PointlessBitwiseExpression
 		return ESCAPE_BYTE & 0xff;
 	}
 
@@ -85,9 +86,9 @@ class GenericIOConstants
 		out.write(HEARTBEAT_BYTE_BUFFER);
 	}
 
-	private static final byte		ESCAPE_BYTE = (byte)0x88;
-	private static final byte		HEARTBEAT_BYTE = (byte)0x87;
-	private static final byte		NULL_BYTE = (byte)0x86;
+	private static final byte		ESCAPE_BYTE = (byte)0xFF;
+	private static final byte		HEARTBEAT_BYTE = (byte)0xFE;
+	private static final byte		NULL_BYTE = (byte)0xFD;
 
 	private static final byte[] 	NULL_BYTE_BUFFER = {ESCAPE_BYTE, NULL_BYTE};
 	private static final byte[] 	HEARTBEAT_BYTE_BUFFER = {ESCAPE_BYTE, HEARTBEAT_BYTE};
