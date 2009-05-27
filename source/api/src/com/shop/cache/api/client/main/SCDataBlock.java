@@ -49,6 +49,8 @@ public class SCDataBlock
 		fTTL = System.currentTimeMillis() + (12 * 60 * 60 * 1000);	// 12 hours
 		fData = null;
 		fIgnoreTTL = false;
+		fReturnedTTL = -1;
+		fCanBeQueued = true;
 	}
 
 	/**
@@ -273,13 +275,60 @@ public class SCDataBlock
 		return this;
 	}
 
+	/**
+	 * Return the TTL returned from a get operation
+	 *
+	 * @return TTL or -1 if not set
+	 */
+	public long			getReturnedTTL()
+	{
+		return fReturnedTTL;
+	}
+
+	/**
+	 * Sets the TTL value returned by {@link #getReturnedTTL()}
+	 *
+	 * @param ttl TTL to set
+	 * @return this
+	 */
+	public SCDataBlock	returnedTTL(long ttl)
+	{
+		fReturnedTTL = ttl;
+		return this;
+	}
+
+	/**
+	 * Return true if operation can be queued (default is true)
+	 *
+	 * @return true/false
+	 */
+	public boolean		getCanBeQueued()
+	{
+		return fCanBeQueued;
+	}
+
+	/**
+	 * change the value of the can-be-queued flag. If true (default), put operations
+	 * may be queued to a background thread. If false, put operations will executed serially.
+	 *
+	 * @param value new value
+	 * @return this
+	 */
+	public SCDataBlock	canBeQueued(boolean value)
+	{
+		fCanBeQueued = value;
+		return this;
+	}
+
 	private String 				fKey;
 	private boolean				fCanBeStoredExternally;
 	private boolean				fCanBeStoredInMemory;
+	private boolean				fCanBeQueued;
 	private int					fVersionNumber;
 	private long				fTTL;
 	private ChunkedByteArray	fData;
 	private Object				fObject;
 	private boolean				fIgnoreTTL;
 	private SCGroupSpec			fGroups;
+	private long				fReturnedTTL;
 }
