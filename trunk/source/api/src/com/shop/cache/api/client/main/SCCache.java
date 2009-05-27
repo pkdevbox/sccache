@@ -208,6 +208,7 @@ public class SCCache
 					if ( (resultObject != null) && (getType != null) )
 					{
 						getType.set(GetTypes.FROM_MEMORY_CACHE);
+						block.returnedTTL(memoryBlock.getTTL());
 					}
 				}
 			}
@@ -353,7 +354,15 @@ public class SCCache
 
 		if ( block.getCanBeStoredExternally() )
 		{
-			fPutSet.offer(new PutWrapper(block, withBackup));
+			PutWrapper 	wrapper = new PutWrapper(block, withBackup);
+			if ( block.getCanBeQueued() )
+			{
+				fPutSet.offer(wrapper);
+			}
+			else
+			{
+				processPut(wrapper);
+			}
 		}
 	}
 
@@ -432,6 +441,7 @@ public class SCCache
 				if ( isUseable )
 				{
 					resultObject = fromManagerBlock.getObject();
+					block.returnedTTL(fromManagerBlock.getTTL());
 				}
 			}
 		}
