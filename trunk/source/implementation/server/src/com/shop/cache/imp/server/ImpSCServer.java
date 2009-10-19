@@ -545,7 +545,7 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 	private static final TrackerTimer.data 		fGetTimerData = new TrackerTimer.data("Gets");
 	private static final TrackerTimer.data 		fPutTimerData = new TrackerTimer.data("Puts");
 
-	private static final int				LAST_GET_TIMES_QTY = 500;
+	private static final int				LAST_GET_TIMES_QTY = 50;
 
 	private static final String 			CHECKIN_VERSION = "1.2";
 

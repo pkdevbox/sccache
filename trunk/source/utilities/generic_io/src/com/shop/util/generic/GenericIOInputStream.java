@@ -28,12 +28,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 class GenericIOInputStream extends InputStream
 {
+	interface HeartbeatReceivedNotifier
+	{
+		/**
+		 * Called when a heartbeat is received
+		 */
+		public void 	heartbeatReceived();
+	}
+
 	/**
 	 * @param stream actual stream to read from. It's vital that this stream is buffered for performance reasons.
+	 * @param notifier optional notifier. Gets called if an heartbeat is received. Can be null
 	 */
-	GenericIOInputStream(InputStream stream)
+	GenericIOInputStream(InputStream stream, HeartbeatReceivedNotifier notifier)
 	{
 		fStream = stream;
+		fHeartbeatNotifier = notifier;
 		fEscapesEnabled = new AtomicBoolean(true);
 	}
 
@@ -72,6 +82,10 @@ class GenericIOInputStream extends InputStream
 					{
 						// read another byte - it's just the heartbeat
 						done = false;
+						if ( fHeartbeatNotifier != null )
+						{
+							fHeartbeatNotifier.heartbeatReceived();
+						}
 						break;
 					}
 
@@ -92,6 +106,7 @@ class GenericIOInputStream extends InputStream
 		fStream.close();
 	}
 
-	private final InputStream 	fStream;
-	private final AtomicBoolean fEscapesEnabled;
+	private final InputStream 				fStream;
+	private final HeartbeatReceivedNotifier fHeartbeatNotifier;
+	private final AtomicBoolean 			fEscapesEnabled;
 }
