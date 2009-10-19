@@ -33,14 +33,14 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * @author Jordan Zimmerman
  */
-class GenericIOClientImpl<T> implements GenericIOClient<T>
+class GenericIOClientImpl<T> implements GenericIOClient<T>, GenericIOInputStream.HeartbeatReceivedNotifier
 {
 	GenericIOClientImpl(Socket s, GenericIOServerImpl<T> parentServer) throws IOException
 	{
 		fSocket = s;
 		fParentServer = parentServer;
 
-		fIOInputStream = new GenericIOInputStream(new BufferedInputStream(fSocket.getInputStream(), fSocket.getReceiveBufferSize()));
+		fIOInputStream = new GenericIOInputStream(new BufferedInputStream(fSocket.getInputStream(), fSocket.getReceiveBufferSize()), this);
 		fIn = new LineReader(fIOInputStream);
 		fOut = new GenericIOOutputStream(new BufferedOutputStream(fSocket.getOutputStream(), fSocket.getSendBufferSize()));
 		fUserValue = new AtomicReference<T>(null);
@@ -180,6 +180,12 @@ class GenericIOClientImpl<T> implements GenericIOClient<T>
 	public boolean		isOpen()
 	{
 		return fIsOpen.get();
+	}
+
+	@Override
+	public void heartbeatReceived()
+	{
+		updateLastReadTicks();
 	}
 
 	void		internalClose()

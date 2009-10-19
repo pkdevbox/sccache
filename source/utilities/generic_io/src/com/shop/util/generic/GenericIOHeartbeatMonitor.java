@@ -106,7 +106,7 @@ class GenericIOHeartbeatMonitor
 		}
 	}
 
-	private static final int	MAX_HEARTBEAT_LAPSE = 1 * 60 * 1000;	// 1 minutes
+	private static final int	MAX_HEARTBEAT_LAPSE = 5 * 60 * 1000;	// 5 minutes
 	private static final int	HEARTBEAT_TICKS = MAX_HEARTBEAT_LAPSE / 3;
 	private static final int	HEARTBEAT_SLEEP_TICKS = HEARTBEAT_TICKS / 2;
 
