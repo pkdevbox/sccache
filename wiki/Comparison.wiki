@@ -3,27 +3,27 @@
 
 = Comparison Chart =
 || || *Shop.com Cache* || *Memcached* || *Jboss* || *Terracotta* || *cache4j* || *EHCache* || *JCS* ||
-||Non-Transactional|| *Y* || *Y* || O || || || || ||
-||Any Size Key|| *Y* || N || ? || || || || ||
-||Any Size Data|| *Y* || N || ? || || || || ||
-||Iterate Keys|| *Y* || N || NL || || || || ||
-||Data stored to disk|| *Y* || N || *Y* || || || || ||
-||Associative Keys|| *Y* || N || N || || || || ||
-||Auto-GC based on TTL|| *Y* || Y (note 1) || *Y* || || || || ||
-||100% Java|| *Y* || N || P || || || || ||
-||Pluggable Architecture|| *Y* || N || *Y* || || || || ||
-||In-process cache|| *Y* || *Y* || *Y* || || || || ||
-||External, Shared Cache|| *Y* || N || *Y* || || || || ||
-||Unlimited Objects in Cache|| *Y* || ? || P || || || || ||
-||Container/Platform Neutral|| *Y* || *Y* || *Y* || || || || ||
-||Horizontally Scalable|| *Y* || *Y* ||*Y* || || || || ||
-||Simple/Clean API|| *Y* || *Y* || N || || || || ||
-||Self-contained - No third party libraries|| *Y* || *Y* || N || || || || ||
-||No XML|| *Y* || *Y* || N || || || || ||
-||Cache any Serializable object|| *Y* || *Y* || *Y* || || || || ||
-||License|| Apache || BSD || LGPL || || || || ||
+||Non-Transactional|| *+Y+* || *+Y+* || O || || *+Y+* || || ||
+||Any Size Key|| *+Y+* || N || ? || || ? || || ||
+||Any Size Data|| *+Y+* || N || ? || || ? || || ||
+||Iterate Keys|| *+Y+* || N || NL || || N || || ||
+||Data stored to disk|| *+Y+* || N || *+Y+* || || N || || ||
+||Associative Keys|| *+Y+* || N || N || || N || || ||
+||Auto-GC based on TTL|| *+Y+* || Y (note 1) || *+Y+* || || *+Y+* || || ||
+||100% Java|| *+Y+* || N || P || || *+Y+* || || ||
+||Pluggable Architecture|| *+Y+* || N || *+Y+* || || N || || ||
+||In-process cache|| *+Y+* || *+Y+* || *+Y+* || || *+Y+* || || ||
+||External, Shared Cache|| *+Y+* || N || *+Y+* || || N || || ||
+||Unlimited Objects in Cache|| *+Y+* || ? || P || || ? || || ||
+||Container/Platform Neutral|| *+Y+* || *+Y+* || *+Y+* || || *+Y+* || || ||
+||Horizontally Scalable|| *+Y+* || *+Y+* || *+Y+* || || N || || ||
+||Simple/Clean API|| *+Y+* || *+Y+* || N || || *+Y+* || || ||
+||Self-contained - No third party libraries|| *+Y+* || *+Y+* || N || || *+Y+* || || ||
+||No XML|| *+Y+* || *+Y+* || N || || N || || ||
+||Cache any Serializable object|| *+Y+* || *+Y+* || *+Y+* || || *+Y+* || || ||
+||License|| Apache || BSD || LGPL || || BSD || || ||
 
- * Y - Yes
+ * +Y+ - Yes
  * N - No
  * O - Optional
  * ? - I don't know
