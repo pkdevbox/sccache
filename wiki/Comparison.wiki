@@ -4,24 +4,24 @@
 = Comparison Chart =
 || || *Shop.com Cache* || *Memcached* || *Jboss* || *Terracotta* || *cache4j* || *EHCache* || *JCS* ||
 ||Non-Transactional|| *Y* || *Y* || O || || || || ||
-||Any Size Key|| *Y* || || ? || || || || ||
-||Any Size Data|| *Y* || || ? || || || || ||
-||Iterate Keys|| *Y* || || NL || || || || ||
-||Data stored to disk|| *Y* || || *Y* || || || || ||
-||Associative Keys|| *Y* || || N || || || || ||
-||Auto-GC based on TTL|| *Y* || || *Y* || || || || ||
-||100% Java|| *Y* || || P || || || || ||
-||Pluggable Architecture|| *Y* || || *Y* || || || || ||
-||In-process cache|| *Y* || || *Y* || || || || ||
-||External, Shared Cache|| *Y* || || *Y* || || || || ||
-||Unlimited Objects in Cache|| *Y* || || P || || || || ||
-||Container/Platform Neutral|| *Y* || || *Y* || || || || ||
-||Horizontally Scalable|| *Y* || ||*Y* || || || || ||
-||Simple/Clean API|| *Y* || || N || || || || ||
-||Self-contained - No third party libraries|| *Y* || || N || || || || ||
-||No XML|| *Y* || || N || || || || ||
-||Cache any Serializable object|| *Y* || || *Y* || || || || ||
-||License|| Apache || || LGPL || || || || ||
+||Any Size Key|| *Y* || N || ? || || || || ||
+||Any Size Data|| *Y* || N || ? || || || || ||
+||Iterate Keys|| *Y* || N || NL || || || || ||
+||Data stored to disk|| *Y* || N || *Y* || || || || ||
+||Associative Keys|| *Y* || N || N || || || || ||
+||Auto-GC based on TTL|| *Y* || Y (note 1) || *Y* || || || || ||
+||100% Java|| *Y* || N || P || || || || ||
+||Pluggable Architecture|| *Y* || N || *Y* || || || || ||
+||In-process cache|| *Y* || *Y* || *Y* || || || || ||
+||External, Shared Cache|| *Y* || N || *Y* || || || || ||
+||Unlimited Objects in Cache|| *Y* || ? || P || || || || ||
+||Container/Platform Neutral|| *Y* || *Y* || *Y* || || || || ||
+||Horizontally Scalable|| *Y* || *Y* ||*Y* || || || || ||
+||Simple/Clean API|| *Y* || *Y* || N || || || || ||
+||Self-contained - No third party libraries|| *Y* || *Y* || N || || || || ||
+||No XML|| *Y* || *Y* || N || || || || ||
+||Cache any Serializable object|| *Y* || *Y* || *Y* || || || || ||
+||License|| Apache || BSD || LGPL || || || || ||
 
  * Y - Yes
  * N - No
@@ -29,6 +29,8 @@
  * ? - I don't know
  * NL - I don't see any APIs/support in their doc
  * P - Probably / it seems so
+
+Note 1: It appears that memcached requires you to request a given key before it will expire it. This is not optimum as old keys that are never referenced again will bloat the cache.
 
 ---
 
