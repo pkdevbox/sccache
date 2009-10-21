@@ -3,24 +3,32 @@
 
 = Comparison Chart =
 || || *Shop.com Cache* || *Memcached* || *Jboss* || *Terracotta* || *cache4j* || *EHCache* || *JCS* ||
-||Non-Transactional|| `*****` || `*****` || || || || || ||
-||Any Size Key|| `*****` || || || || || || ||
-||Any Size Data||`*****` || || || || || || ||
-||Iterate Keys|| `*****` || || || || || || ||
-||Data stored to disk|| `*****` || || || || || || ||
-||Associative Keys|| `*****` || || || || || || ||
-||Auto-GC based on TTL|| `*****` || || || || || || ||
-||100% Java|| `*****` || || || || || || ||
-||Pluggable Architecture|| `*****` || || || || || || ||
-||In-process cache|| `*****` || || || || || || ||
-||External, Shared Cache|| `*****` || || || || || || ||
-||Unlimited Objects in Cache|| `*****` || || || || || || ||
-||Container/Platform Neutral|| `*****` || || || || || || ||
-||Horizontally Scalable|| `*****` || || || || || || ||
-||Simple/Clean API|| `*****` || || || || || || ||
-||Self-contained - No third party libraries|| `*****` || || || || || || ||
-||No XML|| `*****` || || || || || || ||
-||Cache any Serializable object|| `*****` || || || || || || ||
+||Non-Transactional|| *Y* || *Y* || O || || || || ||
+||Any Size Key|| *Y* || || ? || || || || ||
+||Any Size Data|| *Y* || || ? || || || || ||
+||Iterate Keys|| *Y* || || NL || || || || ||
+||Data stored to disk|| *Y* || || *Y* || || || || ||
+||Associative Keys|| *Y* || || N || || || || ||
+||Auto-GC based on TTL|| *Y* || || *Y* || || || || ||
+||100% Java|| *Y* || || P || || || || ||
+||Pluggable Architecture|| *Y* || || *Y* || || || || ||
+||In-process cache|| *Y* || || *Y* || || || || ||
+||External, Shared Cache|| *Y* || || *Y* || || || || ||
+||Unlimited Objects in Cache|| *Y* || || P || || || || ||
+||Container/Platform Neutral|| *Y* || || *Y* || || || || ||
+||Horizontally Scalable|| *Y* || ||*Y* || || || || ||
+||Simple/Clean API|| *Y* || || N || || || || ||
+||Self-contained - No third party libraries|| *Y* || || N || || || || ||
+||No XML|| *Y* || || N || || || || ||
+||Cache any Serializable object|| *Y* || || *Y* || || || || ||
+||License|| Apache || || LGPL || || || || ||
+
+ * Y - Yes
+ * N - No
+ * O - Optional
+ * ? - I don't know
+ * NL - I don't see any APIs/support in their doc
+ * P - Probably / it seems so
 
 ---
 
