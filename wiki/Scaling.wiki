@@ -1,3 +1,4 @@
 #summary Using sccache for very large environments
+#labels Featured
 
 TBD
