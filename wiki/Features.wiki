@@ -25,6 +25,8 @@ sccache automatically cleans up stale objects as well as stale database/storage 
 *Container/Platform neutral*<br>
 sccache is totally self-contained. It doesn't rely on any third party libraries or frameworks. 
 
----
+*Iterate over keys*<br>
+You can query for the set of keys currently in the cache. 
 
-*TBD - complete this page*
+*Regular Expression matching over keys*<br>
+You can query via regular expression for the set of matching keys in the cache.
