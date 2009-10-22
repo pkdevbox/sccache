@@ -1,4 +1,4 @@
-#summary CCDB2 is the server datastore using in sccache. However, it is self-contained and can be used by itself.
+#summary CCDB2 is the server datastore used in sccache. However, it is self-contained and can be used by itself.
 
 == Description ==
 CCDB2 is an extremely fast key to object database and is useful for situations where you have a large number of objects that will be read most of the time and written to occasionally. It is highly optimized for fast reads. It is also optimized for fast loading from disk.
