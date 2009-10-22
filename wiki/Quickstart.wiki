@@ -10,7 +10,7 @@ If availability isn't a concern and your caching needs are small, you could run 
 *Step 3. Start cache server(s)*<br>
 You'll find a bundled, runnable server JAR at `./ServerApplication/ShopCacheServer.jar`. To run it:
 {{{
-java -jar ShopCacheServer.jar -port <p> -path <d>
+java <jvm options> -jar ShopCacheServer.jar -port <p> -path <d>
 }}}
 where `<p>` is the port to listen on and `<d>` is the path to a directory to
 store DB files.
