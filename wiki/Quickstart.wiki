@@ -8,7 +8,8 @@ You can get the binaries and latest source tree from the Downloads tab. The sour
 If availability isn't a concern and your caching needs are small, you could run everything on one machine. At [http://www.shop.com SHOP.COM] we have lots of app servers and lots of cache servers. The cache servers are 64 bit Windows servers with 8GB of memory each.
 
 *Step 3. Start cache servers*<br>
-Here's the code to get the server running:
+Here's the code to get the server running:<br>
+_NOTE: You currently need to build a command line app to run the server. In the future, I hope to bundle a pre-built app_.
 {{{
 SCServerFactory     factory = ShopComCacheFactory.getServerFactory();
 SCServerContext     context = factory.newContext();
