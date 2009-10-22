@@ -7,20 +7,13 @@ You can get the binaries and latest source tree from the Downloads tab. The sour
 *Step 2. Determine hardware needs*<br>
 If availability isn't a concern and your caching needs are small, you could run everything on one machine. At [http://www.shop.com SHOP.COM] we have lots of app servers and lots of cache servers. The cache servers are 64 bit Windows servers with 8GB of memory each.
 
-*Step 3. Start cache servers*<br>
-Here's the code to get the server running:<br>
-_NOTE: You currently need to build a command line app to run the server. In the future, I hope to bundle a pre-built app_.
+*Step 3. Start cache server(s)*<br>
+You'll find a bundled, runnable server JAR at `./ServerApplication/ShopCacheServer.jar`. To run it:
 {{{
-SCServerFactory     factory = ShopComCacheFactory.getServerFactory();
-SCServerContext     context = factory.newContext();
-context.port(/*port number*/);
-
-SCStorage           db = CCDB2StorageFactory.create(new CCDB2Parameters());
-db.open(new File(/*directory path*/));
-
-SCServer            server = factory.newServer(context, db);
-server.join();
+java -jar ShopCacheServer.jar -port <p> -path <d>
 }}}
+where `<p>` is the port to listen on and `<d>` is the path to a directory to
+store DB files.
 
 *Step 4. Configure client side*<br>
 In your client application, you access the cache via the {{{SCCache}}} interface. Here's the code to get an instance:
