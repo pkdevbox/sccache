@@ -33,7 +33,7 @@
 
 Note 1: It appears that memcached requires you to request a given key before it will expire it. This is not optimum as old keys that are never referenced again will bloat the cache.
 
-Note 2: JCS's config specifies MaxObjects. I assume, therefore, that the number of objects is fixed. 
+Note 2: JCS's config specifies !MaxObjects. I assume, therefore, that the number of objects is fixed. 
 
 Note 3: The basic JCS API seems simple enough. But, there are tons of parameters, options, etc. Some may think this is good, it would overwhelm me.
 
