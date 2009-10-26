@@ -10,7 +10,7 @@ CCDB2 is an extremely fast key to object database and is useful for situations w
 
 ==API==
 
-The client API is contained in the class `CCDB2Instance`. An additional class, {{{CCDB2Driver}}}} is used for client required operations.
+The client API is contained in the class `CCDB2Instance`. An additional class, `CCDB2Driver` is used for client required operations.
 
 _CCDB2Driver_<br>
 Clients must implement the CCDB2Driver interface and pass an instance to CCDB2Instance. CCDB2Instance will call its methods as needed:
