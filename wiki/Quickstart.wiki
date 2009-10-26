@@ -15,7 +15,7 @@ java <jvm options> -jar ShopCacheServer.jar -port <p> -path <d>
 where `<p>` is the port to listen on and `<d>` is the path to a directory to
 store DB files.
 
-FYI - the ShopCacheServer source is valuable to look at for its use of the sccache APIs: http://code.google.com/p/sccache/source/browse/trunk/ServerApplication/src/ShopCacheServer.java
+FYI - the !ShopCacheServer source is valuable to look at for its use of the sccache APIs: http://code.google.com/p/sccache/source/browse/trunk/ServerApplication/src/ShopCacheServer.java
 
 *Step 4. Configure client side*<br>
 In your client application, you access the cache via the {{{SCCache}}} interface. Here's the code to get an instance:
