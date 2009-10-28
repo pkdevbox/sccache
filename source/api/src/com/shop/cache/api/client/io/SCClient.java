@@ -16,7 +16,6 @@
 package com.shop.cache.api.client.io;
 
 import com.shop.cache.api.common.SCClientServerCommon;
-import java.util.List;
 
 /**
  * Manages sending commands to a cache server instance
