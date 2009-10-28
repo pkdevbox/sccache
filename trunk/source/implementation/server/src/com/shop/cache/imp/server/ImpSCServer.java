@@ -265,7 +265,7 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 		int 		index = fLastGetTimesIndex.getAndIncrement();
 		if ( index >= LAST_GET_TIMES_QTY )
 		{
-			fLastGetTimesIndex.compareAndSet(index, 0);
+			fLastGetTimesIndex.compareAndSet(index + 1, 0);
 			index = 0;
 		}
 		fLastGetTimes.set(index, timingMessage);
