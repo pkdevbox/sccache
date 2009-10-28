@@ -1,1 +1,15 @@
+
+com.shop.cache.api.client.io
+com.shop.cache.api.client.main
+com.shop.cache.api.commands
+com.shop.cache.api.common
+com.shop.cache.api.server
+com.shop.cache.api.storage
+com.shop.cache.imp.client
+com.shop.cache.imp.common
+com.shop.cache.imp.server
+com.shop.cache.imp.storage.ccdb2
+com.shop.util
+com.shop.util.ccdb2
+com.shop.util.chunked
 com.shop.util.generic
