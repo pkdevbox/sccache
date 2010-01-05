@@ -82,10 +82,6 @@ class GenericIOInputStream extends InputStream
 					{
 						// read another byte - it's just the heartbeat
 						done = false;
-						if ( fHeartbeatNotifier != null )
-						{
-							fHeartbeatNotifier.heartbeatReceived();
-						}
 						break;
 					}
 
@@ -96,7 +92,13 @@ class GenericIOInputStream extends InputStream
 					}
 				}
 			}
+
+			if ( fHeartbeatNotifier != null )
+			{
+				fHeartbeatNotifier.heartbeatReceived();	// any byte received suffices as a heartbeat. i.e. we still have a connection.
+			}
 		}
+
 		return b;
 	}
 

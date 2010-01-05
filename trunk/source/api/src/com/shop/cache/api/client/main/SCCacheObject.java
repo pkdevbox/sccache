@@ -28,7 +28,7 @@ SCCacheObject<MyObject>		cacher = new SCCacheObject<MyObject>
 	new SCDataBlock(myKey),
 	new SCCacheObjectBuilder<MyObject>()
 	{
-		@Override
+		&#64;Override
 		public MyObject buildObject() throws Exception
 		{
 			// ....

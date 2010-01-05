@@ -98,6 +98,16 @@ class GenericIOServerImpl<T> implements GenericIOServer<T>
 				}
 			}
 		}
+
+		try
+		{
+			fListener.notifyServerClosing(this);
+		}
+		catch ( Exception e )
+		{
+			exceptions.add(e);
+		}
+
 		return exceptions;
 	}
 

@@ -54,7 +54,6 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 {
 	ImpSCServer(SCServerContext context, SCStorage database) throws Exception
 	{
-		fContext = context;
 		fDatabase = database;
 
 		fAbnormalCloses = new AtomicInteger(0);
@@ -75,7 +74,7 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 		fServer = GenericIOFactory.makeServer(new InternalListener(false), parameters);
 
 		GenericIOServer<ImpSCServerConnection> 		monitor = null;
-		if ( fContext.getMonitorPort() != 0 )
+		if ( context.getMonitorPort() != 0 )
 		{
 			GenericIOParameters 		contextParameters = new GenericIOParameters().port(context.getMonitorPort()).ssl(false);
 			monitor = GenericIOFactory.makeServer(new InternalListener(true), contextParameters);
@@ -521,6 +520,11 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 		}
 
 		@Override
+		public void notifyServerClosing(GenericIOServer<ImpSCServerConnection> server) throws Exception
+		{
+		}
+
+		@Override
 		public void notifyException(GenericIOServer<ImpSCServerConnection> server, Exception e)
 		{
 			if ( !ImpSCUtils.handleException(e, ImpSCServer.this) )
@@ -547,9 +551,8 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 
 	private static final int				LAST_GET_TIMES_QTY = 50;
 
-	private static final String 			CHECKIN_VERSION = "1.2";
+	private static final String 			CHECKIN_VERSION = "1.3";
 
-	private final SCServerContext 										fContext;
 	private final SCStorage 											fDatabase;
 	private final AtomicInteger 										fAbnormalCloses;
 	private final GenericIOServer<ImpSCServerConnection> 				fServer;
