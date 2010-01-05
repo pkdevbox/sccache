@@ -36,4 +36,9 @@ public interface SCMemoryCache
 	 * @return the block or null. NOTE: ownership is shared with the main SCCache instance.
 	 */
 	public SCDataBlock	get(String key);
+
+	/**
+	 * Purge any objects in memory
+	 */
+	public void			clear();
 }

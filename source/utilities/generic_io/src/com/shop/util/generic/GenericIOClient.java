@@ -135,4 +135,11 @@ public interface GenericIOClient<T>
 	 * stops the client from <b>interpreting</b> heartbeats.
 	 */
 	public void 				disableHeartbeats();
+
+	/**
+	 * Return the server that this client is part of or null if it's a direct client connection
+	 *
+	 * @return server or null
+	 */
+	public GenericIOServer<T> 	getParentServer();
 }

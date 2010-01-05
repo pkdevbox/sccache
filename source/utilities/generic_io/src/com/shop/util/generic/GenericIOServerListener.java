@@ -40,4 +40,13 @@ public interface GenericIOServerListener<T>
 	 * @throws Exception errors (the server will close the connection on errors)
 	 */
 	public void 		notifyClientAccepted(GenericIOServer<T> server, GenericIOClient<T> client) throws Exception;
+
+	/**
+	 * Called when the server is shutting down. Prior to this method being called, all clients of
+	 * the server will have been closed
+	 *
+	 * @param server the server
+	 * @throws Exception any errors
+	 */
+	public void			notifyServerClosing(GenericIOServer<T> server) throws Exception;
 }

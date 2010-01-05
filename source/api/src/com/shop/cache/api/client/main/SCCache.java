@@ -341,6 +341,11 @@ public class SCCache
 		fManager.writeKeyData(fPath);
 	}
 
+	public void				purgeInMemoryCache()
+	{
+		fMemoryCache.clear();
+	}
+
 	private void internalPut(SCDataBlock block, boolean withBackup)
 	{
 		checkOpen();
@@ -410,6 +415,7 @@ public class SCCache
 	{
 		try
 		{
+			//noinspection InfiniteLoopStatement
 			for(;;)
 			{
 				processPut(fPutSet.take());
@@ -483,6 +489,7 @@ public class SCCache
 			return false;
 		}
 
+		//noinspection RedundantIfStatement
 		if ( fromManagerBlock.getTTL() <= rightNow )
 		{
 			return false;

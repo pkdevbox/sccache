@@ -188,6 +188,12 @@ class GenericIOClientImpl<T> implements GenericIOClient<T>, GenericIOInputStream
 		updateLastReadTicks();
 	}
 
+	@Override
+	public GenericIOServer<T> getParentServer()
+	{
+		return fParentServer;
+	}
+
 	void		internalClose()
 	{
 		if ( !fIsOpen.compareAndSet(true, false) )
@@ -227,11 +233,6 @@ class GenericIOClientImpl<T> implements GenericIOClient<T>, GenericIOInputStream
 	long		getLastFlushTicks()
 	{
 		return fLastFlushTicks.get();
-	}
-
-	GenericIOServer<T> getParentServer()
-	{
-		return fParentServer;
 	}
 
 	private void updateLastReadTicks()
