@@ -551,7 +551,7 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 
 	private static final int				LAST_GET_TIMES_QTY = 50;
 
-	private static final String 			CHECKIN_VERSION = "1.3";
+	private static final String 			CHECKIN_VERSION = "1.4";
 
 	private final SCStorage 											fDatabase;
 	private final AtomicInteger 										fAbnormalCloses;
