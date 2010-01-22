@@ -25,6 +25,9 @@ The sccache storage API provides a framework for sccache Servers to write cached
 ===Details===
 See [Architecture].
 
+===Javadoc===
+[http://jordanzimmerman.com/sccache/frameset.html Click here for online Javadoc]
+
 ===Utilities===
  * [SCCacheObject]
  * [ChunkedByteArray]
