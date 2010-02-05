@@ -24,6 +24,5 @@ Our cache was written by one engineer (me). We'd like more eyes on the code and 
 
 *How stable is the code?*<br>
 sccache has been used at SHOP.COM in one form or another for 10 years. So, it's stable enough to use in our production environment. *NOTE:* We are now using this version of sccache on the SHOP.COM livesite!
----
 
 *TBD* - complete this FAQ
