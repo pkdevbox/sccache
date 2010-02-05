@@ -22,6 +22,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -59,7 +60,8 @@ class GenericIOClientImpl<T> implements GenericIOClient<T>, GenericIOInputStream
 	@Override
 	public String toString()
 	{
-		return fAddress.toString();
+		InetAddress localAddress = fAddress.getAddress();
+		return (localAddress != null) ? localAddress.getHostAddress() : fAddress.getHostName();
 	}
 
 	@Override

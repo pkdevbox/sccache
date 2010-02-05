@@ -143,6 +143,19 @@ public class GenericIOLoadBalancer<T> implements Iterable<GenericIOClient<T>>
 	}
 
 	/**
+	 * Set the pool listener
+	 *
+	 * @param listener new listener or null
+	 */
+	public void		setListener(GenericIOClientPoolListener<T> listener)
+	{
+		for ( GenericIOClientPool<T> pool : fPools )
+		{
+			pool.setListener(listener);
+		}
+	}
+
+	/**
 	 * Must be called in a finally block to end iteration
 	 *
 	 * @throws Exception if there was an error
