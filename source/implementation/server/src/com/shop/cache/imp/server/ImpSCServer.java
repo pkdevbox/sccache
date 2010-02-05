@@ -27,6 +27,7 @@ import com.shop.cache.api.storage.SCStorageServerDriver;
 import com.shop.cache.imp.common.ImpSCUtils;
 import com.shop.util.chunked.ChunkedByteArray;
 import com.shop.util.generic.GenericIOClient;
+import com.shop.util.generic.GenericIOClientPoolListener;
 import com.shop.util.generic.GenericIOLineProcessor;
 import com.shop.util.generic.GenericIOFactory;
 import com.shop.util.generic.GenericIOServer;
@@ -79,6 +80,7 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 			GenericIOParameters 		contextParameters = new GenericIOParameters().port(context.getMonitorPort()).ssl(false);
 			monitor = GenericIOFactory.makeServer(new InternalListener(true), contextParameters);
 			System.out.println("Monitor active on port " + context.getMonitorPort());
+			log("Monitor active on port " + context.getMonitorPort(), null, true);
 		}
 		fMonitor = monitor;
 
@@ -98,6 +100,7 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 		fServer.start();
 
 		System.out.println("Server active on port " + context.getPort());
+		log("Server started and active on port " + context.getPort(), null, true);
 	}
 
 	@Override
@@ -193,14 +196,56 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 	@Override
 	public List<String> getConnectionList()
 	{
-		List<String>									tab = new ArrayList<String>();
+		List<List<String>>								displayGrid = new ArrayList<List<String>>();
+		List<AtomicInteger>								maxColumnWidths = new ArrayList<AtomicInteger>();
+		for ( int i = 0; i < ConnectionListColumn.values().length; ++i )
+		{
+			displayGrid.add(new ArrayList<String>());
+			maxColumnWidths.add(new AtomicInteger(0));
+		}
+
 		List<GenericIOClient<ImpSCServerConnection>> 	clients = fServer.getClients();
-		tab.add(clients.size() + " client(s)");
+
+		addToConnectionList(ConnectionListColumn.ADDRESS, "Address", displayGrid, maxColumnWidths);
+		addToConnectionList(ConnectionListColumn.AGE, "Age", displayGrid, maxColumnWidths);
+		addToConnectionList(ConnectionListColumn.STATUS, "Status", displayGrid, maxColumnWidths);
+		addToConnectionList(ConnectionListColumn.LAST_COMMAND_TIME, "Last I/O", displayGrid, maxColumnWidths);
+		addToConnectionList(ConnectionListColumn.ADDRESS, "=======", displayGrid, maxColumnWidths);
+		addToConnectionList(ConnectionListColumn.AGE, "===", displayGrid, maxColumnWidths);
+		addToConnectionList(ConnectionListColumn.STATUS, "======", displayGrid, maxColumnWidths);
+		addToConnectionList(ConnectionListColumn.LAST_COMMAND_TIME, "=================", displayGrid, maxColumnWidths);
 
 		int			index = 0;
 		for ( GenericIOClient<ImpSCServerConnection> connection : clients )
 		{
-			tab.add(++index + ". " + connection.getUserValue().toString() + " - " + connection.getUserValue().getCurrentCommand());
+			String		address = connection.getUserValue().toString();
+			long		age = (System.currentTimeMillis() - connection.getUserValue().getCreationTime()) / (1000 * 60);
+			long		last_command_time = (System.currentTimeMillis() - connection.getUserValue().getLastCommandTime()) / (1000 * 60);
+			String 		status = connection.getUserValue().getCurrentCommand();
+
+			addToConnectionList(ConnectionListColumn.ADDRESS, ++index + ". " + address, displayGrid, maxColumnWidths);
+			addToConnectionList(ConnectionListColumn.AGE, Long.toString(age) + " minute(s)", displayGrid, maxColumnWidths);
+			addToConnectionList(ConnectionListColumn.STATUS, status, displayGrid, maxColumnWidths);
+			addToConnectionList(ConnectionListColumn.LAST_COMMAND_TIME, Long.toString(last_command_time) + " minute(s) ago", displayGrid, maxColumnWidths);
+		}
+
+		List<String>				tab = new ArrayList<String>();
+		tab.add(clients.size() + " client(s)");
+		for ( int i = 0; i < (clients.size() + 2); ++i )	// +2 for the header lines
+		{
+			StringBuilder		thisLine = new StringBuilder();
+			for ( ConnectionListColumn column : ConnectionListColumn.values() )
+			{
+				List<String> 	columnValues = displayGrid.get(column.ordinal());
+				String			value = columnValues.get(i);
+				int				maxWidth = maxColumnWidths.get(column.ordinal()).get();
+				thisLine.append(value);
+				for ( int j = value.length(); j <= maxWidth; ++j )
+				{
+					thisLine.append(" ");
+				}
+			}
+			tab.add(thisLine.toString());
 		}
 
 		return tab;
@@ -420,6 +465,27 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 		return tab;
 	}
 
+	private enum ConnectionListColumn
+	{
+		ADDRESS,
+		AGE,
+		STATUS,
+		LAST_COMMAND_TIME
+	}
+
+	private void		addToConnectionList(ConnectionListColumn column, String value, List<List<String>> displayGrid, List<AtomicInteger> maxColumnWidths)
+	{
+		List<String>		columnValues = displayGrid.get(column.ordinal());
+		columnValues.add(value);
+
+		AtomicInteger		maxWidth = maxColumnWidths.get(column.ordinal());
+		int 				value_length = value.length() + 2;	// margin is 2
+		if ( value_length > maxWidth.get() )
+		{
+			maxWidth.set(value_length);
+		}
+	}
+
 	private SCDataSpec getEntry(String key, boolean ignoreTTL)
 	{
 		SCDataSpec entry = null;
@@ -512,11 +578,18 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 		}
 	}
 
-	private class InternalListener implements GenericIOServerListener<ImpSCServerConnection>
+	private class InternalListener implements GenericIOServerListener<ImpSCServerConnection>, GenericIOClientPoolListener<ImpSCServerConnection>
 	{
 		public InternalListener(boolean isMonitor)
 		{
 			fIsMonitor = isMonitor;
+		}
+
+		@Override
+		public boolean staleClientClosing(GenericIOClient<ImpSCServerConnection> client)
+		{
+			log("Stale client closing: " + client.toString(), null, true);
+			return true;
 		}
 
 		@Override
@@ -551,7 +624,7 @@ class ImpSCServer implements SCServer, SCStorageServerDriver
 
 	private static final int				LAST_GET_TIMES_QTY = 50;
 
-	private static final String 			CHECKIN_VERSION = "1.4";
+	private static final String 			CHECKIN_VERSION = "1.5";
 
 	private final SCStorage 											fDatabase;
 	private final AtomicInteger 										fAbnormalCloses;

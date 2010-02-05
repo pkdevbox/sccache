@@ -38,11 +38,22 @@ class ImpSCServerConnection implements SCConnection, GenericIOLineProcessor.Acce
 		fClient = client;
 		fIsMonitorMode = isMonitorMode;
 		fCurrentCommand = null;
+		fTimeCreated = fLastCommandTime = System.currentTimeMillis();
 	}
 
 	String 		getCurrentCommand()
 	{
 		return (fCurrentCommand != null) ? fCurrentCommand : "<idle>";
+	}
+
+	long 		getLastCommandTime()
+	{
+		return fLastCommandTime;
+	}
+
+	long 		getCreationTime()
+	{
+		return fTimeCreated;
 	}
 
 	@Override
@@ -110,6 +121,7 @@ class ImpSCServerConnection implements SCConnection, GenericIOLineProcessor.Acce
 	public void line(GenericIOClient<ImpSCServerConnection> impSCServerConnectionXGenericIOClient, String line) throws Exception
 	{
 		fCurrentCommand = line;
+		fLastCommandTime = System.currentTimeMillis();
 		
 		SCCommand 	command = SCSetOfCommands.get(fCurrentCommand);
 		if ( fIsMonitorMode && (command != null) && !command.isMonitorCommand() )
@@ -200,5 +212,7 @@ class ImpSCServerConnection implements SCConnection, GenericIOLineProcessor.Acce
 	private final ImpSCServer 								fServer;
 	private final GenericIOClient<ImpSCServerConnection> 	fClient;
 	private final boolean 									fIsMonitorMode;
+	private final long										fTimeCreated;
 	private volatile String									fCurrentCommand;
+	private volatile long									fLastCommandTime;
 }

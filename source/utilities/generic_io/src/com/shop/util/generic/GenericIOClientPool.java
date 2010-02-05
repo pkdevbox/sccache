@@ -60,6 +60,17 @@ public class GenericIOClientPool<T>
 		fState = new GenericIOClientPoolState<T>();
 		fFreeList = new ConcurrentLinkedQueue<GenericIOClient<T>>();
 		fLastKeepAliveCheck = new AtomicLong(System.currentTimeMillis());
+		fListener = null;
+	}
+
+	/**
+	 * Set the pool listener
+	 *
+	 * @param listener new listener or null
+	 */
+	public void		setListener(GenericIOClientPoolListener<T> listener)
+	{
+		fListener = listener;
 	}
 
 	/**
@@ -314,6 +325,20 @@ public class GenericIOClientPool<T>
 				GenericIOClientImpl<T> 		castClient = (GenericIOClientImpl<T>)client;
 				if ( ((System.currentTimeMillis() - castClient.getLastFlushTicks()) > fKeepAliveTicks) && ((System.currentTimeMillis() - castClient.getLastReadTicks()) > fKeepAliveTicks) )
 				{
+					if ( (fListener != null) && !fListener.staleClientClosing(castClient) )
+					{
+						try
+						{
+							// this will reset the last flush ticks
+							castClient.flush();
+						}
+						catch ( IOException e )
+						{
+							// ignore
+						}
+						continue;
+					}
+
 					if ( fFreeList.remove(client) )
 					{
 						try
@@ -338,4 +363,5 @@ public class GenericIOClientPool<T>
 	private final GenericIOClientPoolState<T> 				fState;
 	private final ConcurrentLinkedQueue<GenericIOClient<T>>	fFreeList;
 	private final AtomicLong 								fLastKeepAliveCheck;
+	private volatile GenericIOClientPoolListener<T>			fListener;
 }
